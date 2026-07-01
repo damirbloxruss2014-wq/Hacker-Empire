@@ -9,13 +9,12 @@
 <body>
     <div id="background-dollars"></div>
 
-    <!-- Всплывающий гид-подсказка в правом верхнем углу -->
     <div id="tutorial-guide-box" class="guide-badge hidden">
         <span class="guide-pulse">● GUIDE:</span>
         <span id="guide-text-msg">Инициализация...</span>
     </div>
 
-    <!-- 1. Соглашение -->
+    <!-- Соглашение -->
     <div id="agreement-modal" class="modal-overlay">
         <div class="modal-box">
             <h2>🚨 ПРЕДУПРЕЖДЕНИЕ</h2>
@@ -25,7 +24,7 @@
         </div>
     </div>
 
-    <!-- 2. Туториал -->
+    <!-- Туториал -->
     <div id="tutorial-modal" class="modal-overlay hidden">
         <div class="modal-box">
             <h2>💻 ОБУЧЕНИЕ СИСТЕМЫ</h2>
@@ -37,57 +36,40 @@
         </div>
     </div>
 
-    <!-- 3. Экран Сна -->
+    <!-- Экран Сна -->
     <div id="sleep-screen" class="sleep-overlay hidden">
         <div class="sleep-box"><div class="zzz-animation">Zzz... Zzz...</div><p>Вы спите. Силы восстанавливаются.</p></div>
     </div>
-    <!-- Рабочий стол хакера -->
+    <!-- Рабочий стол -->
     <div id="desktop" class="blurred">
-        
         <div class="shortcuts-grid">
             <div class="shortcut" id="shortcut-anongram" onclick="openApp('anongram')">
-                <div class="shortcut-icon">💬</div>
-                <span class="shortcut-name">Anongram</span>
+                <div class="shortcut-icon">💬</div><span class="shortcut-name">Anongram</span>
             </div>
             <div class="shortcut" id="shortcut-hacknet" onclick="openApp('hacknet')">
-                <div class="shortcut-icon">🌐</div>
-                <span class="shortcut-name">HackNet</span>
+                <div class="shortcut-icon">🌐</div><span class="shortcut-name">HackNet</span>
             </div>
             <div class="shortcut" id="shortcut-compiler" onclick="openApp('compiler')">
-                <div class="shortcut-icon">☣️</div>
-                <span class="shortcut-name">NetBreaker</span>
+                <div class="shortcut-icon">☣️</div><span class="shortcut-name">NetBreaker</span>
             </div>
         </div>
 
         <!-- ОКНО: ANONGRAM -->
         <div id="app-anongram" class="window hidden">
-            <div class="window-header">
-                <span>💬 Anongram Messenger</span>
-                <button class="close-window-btn" onclick="closeApp('anongram')">×</button>
-            </div>
+            <div class="window-header"><span>💬 Anongram Messenger</span><button class="close-window-btn" onclick="closeApp('anongram')">×</button></div>
             <div class="window-body anongram-layout">
                 <div class="chat-sidebar">
                     <div class="chat-contact active">🤖 BlackWork Bot</div>
                     <div class="chat-contact threat hidden" id="threat-contact">⚠️ ENEMY</div>
                 </div>
-                <div class="chat-area">
-                    <div class="chat-messages" id="chat-messages-box">
-                        <div class="msg system-msg">Сессия шифрования установлена.</div>
-                    </div>
-                    <div class="chat-actions" id="chat-actions-zone"></div>
-                </div>
+                <div class="chat-area"><div class="chat-messages" id="chat-messages-box"><div class="msg system-msg">Сессия установлена.</div></div><div class="chat-actions" id="chat-actions-zone"></div></div>
             </div>
         </div>
 
         <!-- ОКНО: HACKNET -->
         <div id="app-hacknet" class="window hidden">
-            <div class="window-header">
-                <span>🌐 HackNet Browser</span>
-                <button class="close-window-btn" onclick="closeApp('hacknet')">×</button>
-            </div>
-            <div id="hacknet-loader" class="hacknet-connection-screen hidden">
-                <div class="connection-log" id="connection-log-box"></div>
-            </div>
+            <div class="window-header"><span>🌐 HackNet Browser</span><button class="close-window-btn" onclick="closeApp('hacknet')">×</button></div>
+            <div id="hacknet-loader" class="hacknet-connection-screen hidden"><div class="connection-log" id="connection-log-box"></div></div>
             <div id="hacknet-content" class="window-body hacknet-layout">
                 <div class="browser-tabs">
                     <button class="tab-btn active" id="tab-btn-5chan" onclick="switchTab('tab-5chan')">5chan</button>
@@ -95,63 +77,39 @@
                     <button class="tab-btn" id="tab-btn-wallet" onclick="switchTab('tab-wallet')">My Wallet</button>
                 </div>
                 <div class="browser-body">
-                    <!-- 5chan -->
                     <div id="tab-5chan" class="tab-content active">
-                        <div class="forum-banner">БОРДА //5CHAN// — АГРЕССИЯ: <span id="aggression-status">НЕЙТРАЛЬНАЯ</span></div>
+                        <div class="forum-banner">БОРДА //5CHAN// — АГРЕССИЯ: <span id="aggression-status">NEUTRAL</span></div>
                         <div id="forum-posting-zone" class="forum-action-box">
-                            <h4>НАПИСАТЬ ПОСТ (1 РАЗ В СУТКИ):</h4>
+                            <h4>ПОСТ (1 РАЗ В СУТКИ):</h4>
                             <div class="forum-options-grid">
-                                <button class="post-opt-btn" onclick="submitForumPost(1)">"Я солью все ваши базы, ничтожества!"</button>
-                                <button class="post-opt-btn" onclick="submitForumPost(2)">"Полиция никогда не поймает нас, мы сила."</button>
-                                <button class="post-opt-btn" onclick="submitForumPost(3)">"Я взламываю только плохие компании."</button>
+                                <button class="post-opt-btn" onclick="submitForumPost(1)">"Я солью все ваши базы!"</button>
+                                <button class="post-opt-btn" onclick="submitForumPost(2)">"Полиция никогда не поймает нас."</button>
+                                <button class="post-opt-btn" onclick="submitForumPost(3)">"Я взламываю только плохие фирмы."</button>
                             </div>
                         </div>
                         <div class="forum-threads" id="forum-threads-box"></div>
                     </div>
-                    <!-- Магазин -->
                     <div id="tab-shop" class="tab-content">
                         <h3>ДАРКНЕТ МАРКЕТ</h3>
                         <div class="shop-grid">
-                            <div class="shop-card">
-                                <h4>Скрытные Прокси v2</h4>
-                                <p>Скрытность: +30%</p>
-                                <button class="buy-btn" onclick="buyProtection(40, 30)">40 BTC</button>
-                            </div>
-                            <div class="shop-card">
-                                <h4>Анонимный Аккаунт</h4>
-                                <p>Скрытность: +50%</p>
-                                <button class="buy-btn" onclick="buyProtection(75, 50)">75 BTC</button>
-                            </div>
-                            <div class="shop-card">
-                                <h4>Новая Материнка</h4>
-                                <p>Разблокирует: Trojan.compiler</p>
-                                <button id="pc-item-1" class="buy-btn" onclick="buyPCUpgrade(60, 1)">60 BTC</button>
-                            </div>
-                            <div class="shop-card">
-                                <h4>Квантовый Проц</h4>
-                                <p>Разблокирует: Spyware.compiler</p>
-                                <button id="pc-item-2" class="buy-btn" onclick="buyPCUpgrade(150, 2)">150 BTC</button>
-                            </div>
+                            <div class="shop-card"><h4>Скрытные Прокси v2</h4><p>Скрытность: +30%</p><button class="buy-btn" onclick="buyProtection(40, 30)">40 BTC</button></div>
+                            <div class="shop-card"><h4>Анонимный Аккаунт</h4><p>Скрытность: +50%</p><button class="buy-btn" onclick="buyProtection(75, 50)">75 BTC</button></div>
+                            <div class="shop-card"><h4>Новая Материнка</h4><p>Доступ: Трояны</p><button id="pc-item-1" class="buy-btn" onclick="buyPCUpgrade(60, 1)">60 BTC</button></div>
+                            <div class="shop-card"><h4>Квантовый Проц</h4><p>Доступ: Шпионы</p><button id="pc-item-2" class="buy-btn" onclick="buyPCUpgrade(150, 2)">150 BTC</button></div>
+                            <!-- НОВЫЕ ТОВАРЫ -->
+                            <div class="shop-card"><h4>Нанять реферала</h4><p>Доход: +5 BTC/час. Шум: +5%</p><button class="buy-btn" onclick="buyWorker()">500 BTC</button></div>
+                            <div class="shop-card"><h4>ПК Quantum</h4><p>Слежка копов снижена х2</p><button id="quantum-pc-btn" class="buy-btn" onclick="buyQuantumPC()">1500 BTC</button></div>
+                            <div class="shop-card" style="border-color:#ff007f;"><h4>Особняк в Дубае</h4><p>Дает макс. репутацию</p><button id="mansion-btn" class="buy-btn" style="color:#ff007f; border-color:#ff007f;" onclick="buyMansion()">4500 BTC</button></div>
+                            <div class="shop-card" style="border-color:#00f0ff;"><h4>Билет на Мальдивы 🌴</h4><p>Уйти на пенсию. ПОБЕДА</p><button class="buy-btn" style="color:#00f0ff; border-color:#00f0ff;" onclick="buyMaldives()">10000 BTC</button></div>
                         </div>
                     </div>
-                    <!-- Кошелек -->
-                    <div id="tab-wallet" class="tab-content">
-                        <h3>КРИПТОКОШЕЛЕК TOR</h3>
-                        <div class="wallet-box">
-                            <span class="wallet-label">Баланс:</span>
-                            <span class="wallet-value" id="wallet-display">0 BTC</span>
-                        </div>
-                    </div>
+                    <div id="tab-wallet" class="tab-content"><h3>КРИПТОКОШЕЛЕК TOR</h3><div class="wallet-box"><span class="wallet-label">Баланс:</span><span class="wallet-value" id="wallet-display">0 BTC</span></div></div>
                 </div>
             </div>
         </div>
-
-        <!-- ОКНО: NETBREAKER -->
+                <!-- ОКНО: NETBREAKER -->
         <div id="app-compiler" class="window hidden">
-            <div class="window-header">
-                <span>☣️ NetBreaker.compiler (НАЖИМАЙ КЛАВИШИ НА КЛАВИАТУРЕ!)</span>
-                <button class="close-window-btn" onclick="closeApp('compiler')">×</button>
-            </div>
+            <div class="window-header"><span>☣️ NetBreaker.compiler (НАЖИМАЙ КЛАВИШИ!)</span><button class="close-window-btn" onclick="closeApp('compiler')">×</button></div>
             <div class="window-body compiler-layout">
                 <div class="compiler-sidebar">
                     <h4>ДОСТУПНЫЙ СОФТ:</h4>
@@ -160,9 +118,7 @@
                     <button id="virus-type-2" class="virus-select-btn locked" onclick="selectVirusType(2)" disabled>🔒 Шпионское ПО (40-80 BTC)</button>
                 </div>
                 <div class="compiler-work-zone">
-                    <div class="compiler-display">
-                        <div class="compiler-log" id="compiler-log-box">Ожидание выбора архитектуры...</div>
-                    </div>
+                    <div class="compiler-display"><div class="compiler-log" id="compiler-log-box">Ожидание выбора архитектуры...</div></div>
                     <div class="compiler-controls">
                         <div class="progress-bar-bg"><div class="progress-bar-fill" id="compile-bar" style="width: 0%"></div></div>
                         <p id="keyboard-hint" style="color:#666; font-size:11px; text-align:center; margin: 5px 0 0 0;" class="hidden">⚠️ НАЖИМАЙ ЛЮБЫЕ БУКВЫ ДЛЯ КОДИНГА!</p>
@@ -175,24 +131,26 @@
         <footer class="taskbar" id="system-taskbar">
             <button class="start-btn" id="sleep-btn-trigger" onclick="toggleSleep()">🔌 ВЫКЛЮЧИТЬ ПК (СПАТЬ)</button>
             <div class="taskbar-indicators">
-                <div class="indicator-group" id="ind-group-stealth">
+                <div class="indicator-group">
                     <span class="ind-label">СКРЫТНОСТЬ:</span>
                     <div class="progress-bar-bg ind-bar"><div class="progress-bar-fill" id="stealth-bar" style="width: 100%;"></div></div>
                     <span id="stealth-display" class="ind-value">100%</span>
                 </div>
-                <div class="indicator-group" id="ind-group-sleep">
+                <div class="indicator-group">
                     <span class="ind-label">УСТАЛОСТЬ:</span>
                     <div class="progress-bar-bg ind-bar"><div class="progress-bar-fill" id="sleep-bar" style="width: 0%; background-color:#00f0ff; box-shadow: 0 0 8px #00f0ff;"></div></div>
                     <span id="sleep-display" class="ind-value">0%</span>
                 </div>
-                <div class="indicator-group" id="ind-group-rep">
+                <div class="indicator-group">
+                    <span class="ind-label">ШТАТ:</span>
+                    <span id="workers-display" style="color:#00f0ff; font-weight:bold; font-size:11px;">0 ХАКЕРОВ</span>
+                </div>
+                <div class="indicator-group">
                     <span class="ind-label">РЕПУТАЦИЯ:</span>
                     <span id="reputation-display" style="color:#ff007f; font-weight:bold; font-size:11px;">100 XP</span>
                 </div>
             </div>
-            <div class="system-tray">
-                <div id="game-clock" class="clock">09:00</div>
-            </div>
+            <div class="system-tray"><div id="game-clock" class="clock">09:00</div></div>
         </footer>
 
     </div>
