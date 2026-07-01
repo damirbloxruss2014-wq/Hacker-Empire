@@ -177,14 +177,18 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    window.closeApp = function (appName) {
+       window.closeApp = function (appName) {
+        // Умная проверка: запрещаем закрывать окна, ТОЛЬКО если это ломает текущий шаг гида
         if (isTutorialActive) {
-            alert("Гид: Не закрывай приложения во время обучения, следуй шагам инструкции!");
-            return;
+            if (tutorialStep === 3 && appName === "compiler") {
+                alert("Гид: Сначала допиши вирус до 100%, прежде чем закрывать NetBreaker!");
+                return;
+            }
         }
         const appWindow = document.getElementById("app-" + appName);
         if (appWindow) appWindow.classList.add("hidden");
     };
+
 
     function runProxyLoader() {
         connectionLog.innerText = "";
