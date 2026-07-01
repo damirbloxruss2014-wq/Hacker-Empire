@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // ИГРОВЫЕ ПЕРЕМЕННЫЕ (STATE)
     let balance = 0;
-    let localHackerLevel = 1; // Исправлено: уникальное имя переменной уровня
+    let localHackerLevel = 1; 
     let stealth = 100;       
     let fatigue = 0;         
     let reputation = 100;    
@@ -18,6 +19,11 @@ document.addEventListener("DOMContentLoaded", function () {
     let compileProgress = 0;
     let contractTimer = 0;   
 
+    // ПЕРЕМЕННЫЕ ИНТЕРАКТИВНОГО ТУТОРИАЛА
+    let isTutorialActive = false;
+    let tutorialStep = 0; // 0 - Старт, 1 - Клик по анонграм, 2 - Выбор кнопок, 3 - Кодинг, 4 - Сдача файла, 5 - Хакнет
+
+    // DOM ЭЛЕМЕНТЫ
     const agreementModal = document.getElementById("agreement-modal");
     const tutorialModal = document.getElementById("tutorial-modal");
     const agreementCheckbox = document.getElementById("agreement-checkbox");
@@ -25,6 +31,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const desktop = document.getElementById("desktop");
     const gameClock = document.getElementById("game-clock");
     const sleepScreen = document.getElementById("sleep-screen");
+    const guideBox = document.getElementById("tutorial-guide-box");
+    const guideText = document.getElementById("guide-text-msg");
     
     const chatMessages = document.getElementById("chat-messages-box");
     const chatActions = document.getElementById("chat-actions-zone");
@@ -59,17 +67,24 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // ЗАКРЫТИЕ ТУТОРИАЛА (ВЫБОР ДА / НЕТ)
     window.closeTutorial = function (startTutorial) {
         tutorialModal.classList.add("hidden");
         desktop.classList.remove("blurred");
+        
         if (startTutorial) {
-            sendBotMessage("BlackWork Bot: Привет, Anon. Я BlackWork. Высылаю контракты. Кликай клавиатуру в NetBreaker, сдавай файлы в чат и следи за Сном! Лови первый заказ.");
+            isTutorialActive = true;
+            tutorialStep = 1;
+            guideBox.classList.remove("hidden");
+            guideText.innerText = "ИНСТРУКЦИЯ: Нажмите на приложение Anongram. Другие ярлыки заблокированы.";
+            sendBotMessage("Система: Запущен интерактивный режим обучения.");
         } else {
-            sendBotMessage("BlackWork Bot: Работаешь соло? Первые контракты уже в чате. Открывай NetBreaker и пиши код.");
+            sendBotMessage("BlackWork Bot: Работаешь соло? Первые контракты уже в чате.");
+            generateNewContract();
         }
-        generateNewContract();
+        
         clockInterval = setInterval(updateGameClock, 1000); 
-        setInterval(passiveThreatLogic, 60000); 
+        setInterval(passiveThreatLogic, 60000); // Скрытность падает раз в 2 часа (раз в 60 реальных сек)
     };
 
     function updateGameClock() {
@@ -101,6 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     window.toggleSleep = function() {
+        if (isTutorialActive) return alert("Гид: Нельзя лечь спать во время прохождения туториала!");
         if (currentContract && currentContract.status === "active") return alert("Нельзя лечь спать во время компиляции вируса!");
         isSleeping = true;
         sleepScreen.classList.remove("hidden");
@@ -117,16 +133,40 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     function triggerFaint() {
-        alert("Вы потеряли сознание от усталости! Минус 30% BTC за лечение.");
+        alert("Вы упали в обморок от дикой усталости! Минус 30% BTC за срочное лечение.");
         balance = Math.floor(balance * 0.7); 
         fatigue = 30;
         gameHour = (gameHour + 10) % 24; 
         updateUI();
     }
+    // УПРАВЛЕНИЕ ОКНАМИ И БЛОКИРОВКА ЯРЛЫКОВ В ТУТОРИАЛЕ
     window.openApp = function (appName) {
+        // Если туториал активен, жестко ограничиваем действия игрока по шагам
+        if (isTutorialActive) {
+            if (tutorialStep === 1 && appName !== "anongram") {
+                alert("Гид: Сначала открой Anongram, как указано в инструкции!");
+                return;
+            }
+            if (tutorialStep === 3 && appName !== "compiler") {
+                alert("Гид: Сейчас нужно открыть NetBreaker, чтобы написать вирус!");
+                return;
+            }
+            if (tutorialStep === 5 && appName !== "hacknet") {
+                alert("Гид: Открой HackNet, чтобы изучить скрытые вкладки сети!");
+                return;
+            }
+        }
+
         const appWindow = document.getElementById("app-" + appName);
         if (!appWindow) return;
         appWindow.classList.remove("hidden");
+
+        if (appName === "anongram" && isTutorialActive && tutorialStep === 1) {
+            tutorialStep = 2;
+            guideText.innerText = "ИНСТРУКЦИЯ: Изучи чат с ботом BlackWork. Прими заказ или попробуй торговаться кнопкой 'Торг'.";
+            generateNewContract();
+        }
+
         if (appName === "hacknet") {
             hacknetContent.style.display = "none";
             hacknetLoader.classList.remove("hidden");
@@ -138,6 +178,10 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     window.closeApp = function (appName) {
+        if (isTutorialActive) {
+            alert("Гид: Не закрывай приложения во время обучения, следуй шагам инструкции!");
+            return;
+        }
         const appWindow = document.getElementById("app-" + appName);
         if (appWindow) appWindow.classList.add("hidden");
     };
@@ -156,11 +200,16 @@ document.addEventListener("DOMContentLoaded", function () {
             if (index < logs.length) {
                 connectionLog.innerText += logs[index] + "\n";
                 index++;
-                setTimeout(printLog, 250);
+                setTimeout(printLog, 200);
             } else {
                 setTimeout(function() {
                     hacknetLoader.classList.add("hidden");
                     hacknetContent.style.display = "flex";
+                    if (isTutorialActive && tutorialStep === 5) {
+                        tutorialStep = 6;
+                        guideText.innerText = "ИНСТРУКЦИЯ: Переключай вкладки 5chan, Shop и Wallet. Узнай свой баланс и защиту.";
+                        setTimeout(finishTutorial, 6000); // Через 6 сек завершаем обучение
+                    }
                     updateUI();
                 }, 300);
             }
@@ -218,6 +267,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 sendPlayerMessage("Я берусь за этот заказ.");
                 currentContract.status = "active";
                 sendBotMessage("BlackWork Bot: Отлично. Переходи в приложение 'NetBreaker'. Кликай кнопки на клавиатуре, чтобы написать код ядра.");
+                if (isTutorialActive && tutorialStep === 2) {
+                    tutorialStep = 3;
+                    guideText.innerText = "ИНСТРУКЦИЯ: Открой приложение NetBreaker на рабочем столе для написания кода вируса.";
+                }
                 renderChatActions();
             };
 
@@ -232,6 +285,7 @@ document.addEventListener("DOMContentLoaded", function () {
             refuseBtn.className = "nav-btn cancel-btn";
             refuseBtn.innerText = "ОТКЛОНИТЬ";
             refuseBtn.onclick = function() {
+                if (isTutorialActive) return alert("Гид: В туториале нельзя отклонять контракт, нажми 'ПРИНЯТЬ ЗАДАНИЕ'!");
                 sendPlayerMessage("Не интересно. Ищи другого.");
                 currentContract = null;
                 setTimeout(generateNewContract, 4000);
@@ -261,7 +315,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 currentContract = null;
                 updateUI();
                 chatActions.innerHTML = "";
-                setTimeout(generateNewContract, 4000);
+                
+                if (isTutorialActive && tutorialStep === 4) {
+                    tutorialStep = 5;
+                    guideText.innerText = "ИНСТРУКЦИЯ: Молодец! Деньги на базе. Теперь открой браузер HackNet, чтобы проверить даркнет-маркет.";
+                } else {
+                    setTimeout(generateNewContract, 4000);
+                }
             };
             chatActions.appendChild(sendFileBtn);
         }
@@ -273,21 +333,22 @@ document.addEventListener("DOMContentLoaded", function () {
         sendPlayerMessage("Риски выросли. Моя работа стоит дороже.");
 
         let failChance = currentContract.haggleCount * 0.35;
-        
+        if (isTutorialActive) failChance = 0; // В туториале торг всегда успешен!
+
         if (currentContract.price >= 30) {
-            sendBotMessage("BlackWork Bot: Это мой абсолютный потолок. Больше 30 BTC я не дам. Либо берешь, либо я ухожу.");
+            sendBotMessage("BlackWork Bot: Это мой абсолютный потолок. Больше 30 BTC я не дам.");
             return;
         }
 
         if (Math.random() < failChance) {
-            sendBotMessage("BlackWork Bot: Ты зажрался. Я отменяю заказ и найду другого хакера.");
+            sendBotMessage("BlackWork Bot: Ты зажрался. Я отменяю заказ.");
             reputation = Math.max(0, reputation - 5); 
             currentContract = null;
             chatActions.innerHTML = "";
             updateUI();
             setTimeout(generateNewContract, 5000);
         } else {
-            let bump = Math.floor(currentContract.price * (Math.random() * 0.15 + 0.20));
+            let bump = Math.floor(currentContract.price * 0.25);
             currentContract.price = Math.min(30, currentContract.price + bump); 
             sendBotMessage("BlackWork Bot: Ладно, уговорил. Повышаю цену до " + currentContract.price + " BTC. По рукам?");
             renderChatActions();
@@ -308,14 +369,19 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
+    // КОДИНГ КЛАВИАТУРОЙ + ОБУЧЕНИЕ ШАГ ЗА ШАГОМ
     document.addEventListener("keydown", function (event) {
         const compilerWindow = document.getElementById("app-compiler");
         if (compilerWindow.classList.contains("hidden") || !currentContract || currentContract.status !== "active") return;
         if (event.repeat) return;
 
-        let speed = 4 * (pcUpgradeLevel + 1);
+        let speed = 5 * (pcUpgradeLevel + 1);
         compileProgress = Math.min(100, compileProgress + speed);
         compileBar.style.width = compileProgress + "%";
+
+        if (isTutorialActive && tutorialStep === 3) {
+            guideText.innerText = "ИНСТРУКЦИЯ: Отлично, код пишется! Нажимай кнопки, пока шкала не дойдет до 100%.";
+        }
 
         const codeLines = [
             "import os, sys, socket",
@@ -323,9 +389,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "payload = generate_payload(aes_256)",
             "bypass_firewall(target_dns)",
             "inject_trojan_signature()",
-            "clear_system_logs()",
-            "encrypt_database_keys()",
-            "disconnect_session(hash_md5)"
+            "clear_system_logs()"
         ];
         let randomLine = codeLines[Math.floor(Math.random() * codeLines.length)];
         compilerLog.innerText += "\nAnonymous@root:~# " + randomLine;
@@ -339,12 +403,34 @@ document.addEventListener("DOMContentLoaded", function () {
             currentContract.status = "compiled";
             stealth = Math.max(0, stealth - 12); 
             
-            compilerLog.innerText = "[SUCCESS] Сборка файла завершена!\n\n[ВНИМАНИЕ]: Зайди в Anongram и отправь готовый файл клиенту для получения BTC.";
+            compilerLog.innerText = "[SUCCESS] Сборка файла завершена!\n\n[ВНИМАНИЕ]: Зайди в Anongram и отправь файл клиенту.";
             
+            if (isTutorialActive && tutorialStep === 3) {
+                tutorialStep = 4;
+                guideText.innerText = "ИНСТРУКЦИЯ: Вирус готов! Теперь вернись в Anongram и нажми 'ОТПРАВИТЬ СКОМПИЛИРОВАННЫЙ ФАЙЛ'.";
+            }
+
             renderChatActions();
             updateUI();
         }
     });
+
+    // ЗАВЕРШЕНИЕ ОБУЧЕНИЯ ГИДОМ
+    function finishTutorial() {
+        if (!isTutorialActive) return;
+        isTutorialActive = false;
+        tutorialStep = 0;
+        
+        guideText.innerHTML = "<span style='color:#39ff14;'>ОБУЧЕНИЕ ЗАВЕРШЕНО!</span> Ниже показаны шкалы: Скрытность (падает каждые 2 часа), Усталость (растет от работы) и Репутация. Спи кнопкой 'ВЫКЛЮЧИТЬ ПК'. Удачи!";
+        
+        setTimeout(function() {
+            guideBox.classList.add("hidden");
+            // Закрываем все окна, чтобы игрок начал с чистого листа свободный режим
+            document.querySelectorAll('.window').forEach(win => win.classList.add('hidden'));
+            sendBotMessage("BlackWork Bot: Инструктаж окончен. Твоя анонимность теперь в твоих руках. Высылаю первый реальный контракт.");
+            generateNewContract();
+        }, 8000);
+    }
 
     window.submitForumPost = function(optionId) {
         if (!canPostToday) return;
