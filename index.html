@@ -7,22 +7,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div id="background-dollars"></div>
 
     <!-- 1. Соглашение -->
     <div id="agreement-modal" class="modal-overlay">
         <div class="modal-box">
-            <h2>🚨 СИСТЕМНОЕ ПРЕДУПРЕЖДЕНИЕ</h2>
-            <div class="modal-text">
-                ВНИМАНИЕ: Данный ресурс является симулятором виртуального взлома Hacker Empire и носит исключительно развлекательный характер. Все совершаемые действия внутри игры являются имитацией кода и не наносят реального вреда. Данные никуда не сохраняются и не распространяются.
-            </div>
-            <div class="modal-checkbox-zone" id="checkbox-zone-wrapper">
-                <label class="checkbox-container">
-                    <input type="checkbox" id="agreement-checkbox">
-                    Я принимаю условия использования терминала
-                </label>
-            </div>
+            <h2>🚨 ПРЕДУПРЕЖДЕНИЕ</h2>
+            <div class="modal-text">Данный ресурс является симулятором Hacker Empire и носит развлекательный характер. Все действия имитируют взлом и не наносят реального вреда.</div>
+            <div class="modal-checkbox-zone"><label><input type="checkbox" id="agreement-checkbox"> Я принимаю условия терминала</label></div>
             <button id="agreement-btn" disabled>ПОДКЛЮЧИТЬСЯ</button>
         </div>
     </div>
@@ -31,7 +23,7 @@
     <div id="tutorial-modal" class="modal-overlay hidden">
         <div class="modal-box">
             <h2>💻 ОБУЧЕНИЕ СИСТЕМЫ</h2>
-            <p>Вы впервые в сети под ником Anonymous. Хотите пройти краткий инструктаж по взлому систем, написанию троянов и защите от спецслужб?</p>
+            <p>Хотите пройти краткий инструктаж по взлому систем, написанию троянов и защите от спецслужб?</p>
             <div class="tutorial-buttons">
                 <button class="nav-btn cancel-btn" onclick="closeTutorial(false)">НЕТ</button>
                 <button class="nav-btn accept-btn" onclick="closeTutorial(true)">ДА</button>
@@ -39,7 +31,11 @@
         </div>
     </div>
 
-    <!-- Рабочий стол -->
+    <!-- 3. Экран Сна -->
+    <div id="sleep-screen" class="sleep-overlay hidden">
+        <div class="sleep-box"><div class="zzz-animation">Zzz... Zzz...</div><p>Вы спите. Силы восстанавливаются.</p></div>
+    </div>
+    <!-- Рабочий стол хакера -->
     <div id="desktop" class="blurred">
         
         <div class="shortcuts-grid">
@@ -147,36 +143,45 @@
         <!-- ОКНО: NETBREAKER -->
         <div id="app-compiler" class="window hidden">
             <div class="window-header">
-                <span>☣️ NetBreaker.compiler</span>
+                <span>☣️ NetBreaker.compiler (НАЖИМАЙ КЛАВИШИ НА КЛАВИАТУРЕ!)</span>
                 <button class="close-window-btn" onclick="closeApp('compiler')">×</button>
             </div>
             <div class="window-body compiler-layout">
                 <div class="compiler-sidebar">
                     <h4>ДОСТУПНЫЙ СОФТ:</h4>
-                    <button id="virus-type-0" class="virus-select-btn active" onclick="selectVirusType(0)">Простой Скрипт (6-12 BTC)</button>
-                    <button id="virus-type-1" class="virus-select-btn locked" onclick="selectVirusType(1)" disabled>🔒 Троян (12-25 BTC)</button>
-                    <button id="virus-type-2" class="virus-select-btn locked" onclick="selectVirusType(2)" disabled>🔒 Шпионское ПО (30-60 BTC)</button>
+                    <button id="virus-type-0" class="virus-select-btn active" onclick="selectVirusType(0)">Простой Скрипт (9-19 BTC)</button>
+                    <button id="virus-type-1" class="virus-select-btn locked" onclick="selectVirusType(1)" disabled>🔒 Троян (18-35 BTC)</button>
+                    <button id="virus-type-2" class="virus-select-btn locked" onclick="selectVirusType(2)" disabled>🔒 Шпионское ПО (40-80 BTC)</button>
                 </div>
                 <div class="compiler-work-zone">
                     <div class="compiler-display">
-                        <div class="compiler-log" id="compiler-log-box">Ожидание архитектуры...</div>
+                        <div class="compiler-log" id="compiler-log-box">Ожидание выбора архитектуры...</div>
                     </div>
                     <div class="compiler-controls">
                         <div class="progress-bar-bg"><div class="progress-bar-fill" id="compile-bar" style="width: 0%"></div></div>
-                        <button id="compile-start-btn" class="nav-btn" style="width: 100%; margin-top:10px;" onclick="startCompiling()" disabled>ЗАПУСТИТЬ КОМПИЛЯЦИЮ</button>
+                        <p id="keyboard-hint" style="color:#666; font-size:11px; text-align:center; margin: 5px 0 0 0;" class="hidden">⚠️ НАЖИМАЙ ЛЮБЫЕ БУКВЫ ДЛЯ КОДИНГА!</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Таскбар -->
+        <!-- Панель Задач (Таскбар) -->
         <footer class="taskbar">
-            <div class="start-btn">⚙️ SYSTEM</div>
+            <button class="start-btn" onclick="toggleSleep()">🔌 ВЫКЛЮЧИТЬ ПК (СПАТЬ)</button>
             <div class="taskbar-indicators">
                 <div class="indicator-group">
                     <span class="ind-label">СКРЫТНОСТЬ:</span>
                     <div class="progress-bar-bg ind-bar"><div class="progress-bar-fill" id="stealth-bar" style="width: 100%;"></div></div>
                     <span id="stealth-display" class="ind-value">100%</span>
+                </div>
+                <div class="indicator-group">
+                    <span class="ind-label">УСТАЛОСТЬ:</span>
+                    <div class="progress-bar-bg ind-bar"><div class="progress-bar-fill" id="sleep-bar" style="width: 0%; background-color:#00f0ff; box-shadow: 0 0 8px #00f0ff;"></div></div>
+                    <span id="sleep-display" class="ind-value">0%</span>
+                </div>
+                <div class="indicator-group">
+                    <span class="ind-label">РЕПУТАЦИЯ:</span>
+                    <span id="reputation-display" style="color:#ff007f; font-weight:bold; font-size:11px;">100 XP</span>
                 </div>
             </div>
             <div class="system-tray">
