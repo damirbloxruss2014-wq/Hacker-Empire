@@ -9,6 +9,12 @@
 <body>
     <div id="background-dollars"></div>
 
+    <!-- Всплывающий гид-подсказка в правом верхнем углу -->
+    <div id="tutorial-guide-box" class="guide-badge hidden">
+        <span class="guide-pulse">● GUIDE:</span>
+        <span id="guide-text-msg">Инициализация...</span>
+    </div>
+
     <!-- 1. Соглашение -->
     <div id="agreement-modal" class="modal-overlay">
         <div class="modal-box">
@@ -39,15 +45,15 @@
     <div id="desktop" class="blurred">
         
         <div class="shortcuts-grid">
-            <div class="shortcut" onclick="openApp('anongram')">
+            <div class="shortcut" id="shortcut-anongram" onclick="openApp('anongram')">
                 <div class="shortcut-icon">💬</div>
                 <span class="shortcut-name">Anongram</span>
             </div>
-            <div class="shortcut" onclick="openApp('hacknet')">
+            <div class="shortcut" id="shortcut-hacknet" onclick="openApp('hacknet')">
                 <div class="shortcut-icon">🌐</div>
                 <span class="shortcut-name">HackNet</span>
             </div>
-            <div class="shortcut" onclick="openApp('compiler')">
+            <div class="shortcut" id="shortcut-compiler" onclick="openApp('compiler')">
                 <div class="shortcut-icon">☣️</div>
                 <span class="shortcut-name">NetBreaker</span>
             </div>
@@ -84,9 +90,9 @@
             </div>
             <div id="hacknet-content" class="window-body hacknet-layout">
                 <div class="browser-tabs">
-                    <button class="tab-btn active" onclick="switchTab('tab-5chan')">5chan</button>
-                    <button class="tab-btn" onclick="switchTab('tab-shop')">Upgrade Shop</button>
-                    <button class="tab-btn" onclick="switchTab('tab-wallet')">My Wallet</button>
+                    <button class="tab-btn active" id="tab-btn-5chan" onclick="switchTab('tab-5chan')">5chan</button>
+                    <button class="tab-btn" id="tab-btn-shop" onclick="switchTab('tab-shop')">Upgrade Shop</button>
+                    <button class="tab-btn" id="tab-btn-wallet" onclick="switchTab('tab-wallet')">My Wallet</button>
                 </div>
                 <div class="browser-body">
                     <!-- 5chan -->
@@ -118,12 +124,12 @@
                             </div>
                             <div class="shop-card">
                                 <h4>Новая Материнка</h4>
-                                <p>Разблокирует: Трояны</p>
+                                <p>Разблокирует: Trojan.compiler</p>
                                 <button id="pc-item-1" class="buy-btn" onclick="buyPCUpgrade(60, 1)">60 BTC</button>
                             </div>
                             <div class="shop-card">
                                 <h4>Квантовый Проц</h4>
-                                <p>Разблокирует: Шпионский софт</p>
+                                <p>Разблокирует: Spyware.compiler</p>
                                 <button id="pc-item-2" class="buy-btn" onclick="buyPCUpgrade(150, 2)">150 BTC</button>
                             </div>
                         </div>
@@ -166,20 +172,20 @@
         </div>
 
         <!-- Панель Задач (Таскбар) -->
-        <footer class="taskbar">
-            <button class="start-btn" onclick="toggleSleep()">🔌 ВЫКЛЮЧИТЬ ПК (СПАТЬ)</button>
+        <footer class="taskbar" id="system-taskbar">
+            <button class="start-btn" id="sleep-btn-trigger" onclick="toggleSleep()">🔌 ВЫКЛЮЧИТЬ ПК (СПАТЬ)</button>
             <div class="taskbar-indicators">
-                <div class="indicator-group">
+                <div class="indicator-group" id="ind-group-stealth">
                     <span class="ind-label">СКРЫТНОСТЬ:</span>
                     <div class="progress-bar-bg ind-bar"><div class="progress-bar-fill" id="stealth-bar" style="width: 100%;"></div></div>
                     <span id="stealth-display" class="ind-value">100%</span>
                 </div>
-                <div class="indicator-group">
+                <div class="indicator-group" id="ind-group-sleep">
                     <span class="ind-label">УСТАЛОСТЬ:</span>
                     <div class="progress-bar-bg ind-bar"><div class="progress-bar-fill" id="sleep-bar" style="width: 0%; background-color:#00f0ff; box-shadow: 0 0 8px #00f0ff;"></div></div>
                     <span id="sleep-display" class="ind-value">0%</span>
                 </div>
-                <div class="indicator-group">
+                <div class="indicator-group" id="ind-group-rep">
                     <span class="ind-label">РЕПУТАЦИЯ:</span>
                     <span id="reputation-display" style="color:#ff007f; font-weight:bold; font-size:11px;">100 XP</span>
                 </div>
