@@ -1,33 +1,27 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // ИГРОВЫЕ ПЕРЕМЕННЫЕ (STATE)
     let balance = 0;
-    let localHackerLevel = 1; 
-    let stealth = 100;       
-    let fatigue = 0;         
-    let reputation = 100;    
-    let pcUpgradeLevel = 0;  
-
-    // ЭКОНОМИКА И ПОБЕДА
-    let workersCount = 0;       // Количество нанятых хакеров
-    let hasQuantumPC = false;   // Куплен ли суперкомпьютер AI-Quantum
-    let isGameOver = false;     // Флаг окончания игры
+    let localHackerLevel = 1;
+    let stealth = 100;
+    let fatigue = 0;
+    let reputation = 100;
+    let pcUpgradeLevel = 0;
+    let workersCount = 0;
+    let hasQuantumPC = false;
+    let isGameOver = false;
+    let isSleeping = false;
 
     let gameHour = 9;
     let gameMinute = 0;
     let clockInterval = null;
-    let isSleeping = false;
-
     let currentContract = null;
-    let selectedVirusId = 0; 
-    let canPostToday = true; 
+    let selectedVirusId = 0;
+    let canPostToday = true;
     let aggressionPoints = 0;
     let compileProgress = 0;
-    let contractTimer = 0;   
-
+    let contractTimer = 0;
     let isTutorialActive = false;
-    let tutorialStep = 0; 
+    let tutorialStep = 0;
 
-    // DOM ЭЛЕМЕНТЫ
     const agreementModal = document.getElementById("agreement-modal");
     const tutorialModal = document.getElementById("tutorial-modal");
     const agreementCheckbox = document.getElementById("agreement-checkbox");
@@ -37,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const sleepScreen = document.getElementById("sleep-screen");
     const guideBox = document.getElementById("tutorial-guide-box");
     const guideText = document.getElementById("guide-text-msg");
-    
     const chatMessages = document.getElementById("chat-messages-box");
     const chatActions = document.getElementById("chat-actions-zone");
     const threatContact = document.getElementById("threat-contact");
@@ -57,322 +50,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const compileBar = document.getElementById("compile-bar");
     const keyboardHint = document.getElementById("keyboard-hint");
 
-    agreementCheckbox.addEventListener("change", function () {
-        agreementBtn.disabled = !this.checked;
-    });
-
-    agreementBtn.addEventListener("click", function () {
-        if (agreementCheckbox.checked) {
-            agreementModal.classList.add("hidden");
-            tutorialModal.classList.remove("hidden");
-        }
-    });
-
-    window.closeTutorial = function (startTutorial) {
-        tutorialModal.classList.add("hidden");
-        desktop.classList.remove("blurred");
-        if (startTutorial) {
-            isTutorialActive = true; tutorialStep = 1; guideBox.classList.remove("hidden");
-            guideText.innerText = "ИНСТРУКЦИЯ: Нажмите на приложение Anongram. Другие ярлыки заблокированы.";
-            sendBotMessage("Система: Запущен интерактивный режим обучения.");
-        } else {
-            sendBotMessage("BlackWork Bot: Работаешь соло? Первые контракты уже в чате.");
-            generateNewContract();
-        }
-        clockInterval = setInterval(updateGameClock, 1000); 
-        setInterval(passiveThreatLogic, 1000); 
-    };
-
-    function updateGameClock() {
-        if (isSleeping || isGameOver) return; 
-        gameMinute += 1;
-        if (currentContract && currentContract.status === "pending") {
-            contractTimer += 1;
-            if (contractTimer > 20) { reputation = Math.max(0, reputation - 2); updateUI(); }
-        }
-        if (gameMinute >= 60) { 
-            gameMinute = 0; gameHour += 1; 
-            fatigue = Math.min(100, fatigue + 4);
-            if (fatigue >= 100) { triggerFaint(); }
-            
-            // НАЕМНЫЕ РАБОТНИКИ: каждый час приносят +5 BTC за штуку пассивного дохода!
-            if (workersCount > 0) {
-                balance += workersCount * 5;
-                sendBotMessage("Система: Штат хакеров принес вам пассивный доход +" + (workersCount * 5) + " BTC.");
-            }
-
-            if (gameHour >= 24) { gameHour = 0; canPostToday = true; postingZone.classList.remove("hidden"); }
-        }
-        gameClock.innerText = String(gameHour).padStart(2, '0') + ":" + String(gameMinute).padStart(2, '0');
-        updateUI();
-    }
-
-    // МАГАЗИН: ЛОГИКА НАЙМА РАБОТНИКОВ
-    window.buyWorker = function() {
-        if (balance >= 500) {
-            balance -= 500;
-            workersCount += 1;
-            updateUI();
-            alert("Контракт подписан! Новый реферал начал пассивный майнинг софта (+5 BTC/час).");
-        } else { alert("Недостаточно BTC! Наём стоит 500 BTC."); }
-    };
-
-    // МАГАЗИН: СУПЕРКОМПЬЮТЕР AI-QUANTUM
-    window.buyQuantumPC = function() {
-        if (balance >= 1500) {
-            balance -= 1500;
-            hasQuantumPC = true;
-            document.getElementById("quantum-pc-btn").disabled = true;
-            document.getElementById("quantum-pc-btn").innerText = "АКТИВИРОВАН";
-            updateUI();
-            alert("AI-Quantum суперкомпьютер запущен. Пассивная слежка копов снижена в 2 раза!");
-        } else { alert("Недостаточно BTC!"); }
-    };
-
-    window.toggleSleep = function() {
-        if (isTutorialActive) return alert("Гид: Нельзя лечь спать во время туториала!");
-        if (currentContract && currentContract.status === "active") return alert("Нельзя лечь спать во время сборки вируса!");
-        isSleeping = true; sleepScreen.classList.remove("hidden");
-        setTimeout(function() {
-            fatigue = 0; gameHour = (gameHour + 8) % 24; isSleeping = false; sleepScreen.classList.add("hidden");
-            sendBotMessage("BlackWork Bot: Проснулся? Твоя репутация обновилась. Жду новые вирусы.");
-            if (!currentContract) generateNewContract();
-            updateUI();
-        }, 3000); 
-    };
-
-    function triggerFaint() {
-        alert("Вы упали в обморок от усталости! Минус 30% BTC за лечение.");
-        balance = Math.floor(balance * 0.7); fatigue = 30; gameHour = (gameHour + 10) % 24; updateUI();
-    }
-    window.openApp = function (appName) {
-        if (isTutorialActive) {
-            if (tutorialStep === 1 && appName !== "anongram") return alert("Гид: Сначала открой Anongram!");
-            if (tutorialStep === 3 && appName !== "compiler") return alert("Гид: Сейчас нужно открыть NetBreaker!");
-            if (tutorialStep === 5 && appName !== "hacknet") return alert("Гид: Открой HackNet!");
-        }
-        const appWindow = document.getElementById("app-" + appName);
-        if (!appWindow) return;
-        appWindow.classList.remove("hidden");
-        if (appName === "anongram" && isTutorialActive && tutorialStep === 1) {
-            tutorialStep = 2; guideText.innerText = "ИНСТРУКЦИЯ: Прими заказ или поторгуйся кнопкой 'Торг'.";
-            generateNewContract();
-        }
-        if (appName === "hacknet") { hacknetContent.style.display = "none"; hacknetLoader.classList.remove("hidden"); runProxyLoader(); }
-        if (appName === "compiler") { selectVirusType(selectedVirusId); }
-    };
-
-    window.closeApp = function (appName) {
-        if (isTutorialActive && tutorialStep === 3 && appName === "compiler") {
-            alert("Гид: Сначала допиши вирус до 100%!"); return;
-        }
-        const appWindow = document.getElementById("app-" + appName);
-        if (appWindow) appWindow.classList.add("hidden");
-    };
-
-    function runProxyLoader() {
-        connectionLog.innerText = "";
-        const logs = ["[SYSTEM] Запуск прокси...", "[PROXY] Сервер: Мальдивы... Ок", "[VPN] Защита AES-256... Стабильно", "[TOR] Маршрутизация TOR... Ок", "[SUCCESS] Вход разрешен."];
-        let index = 0;
-        function printLog() {
-            if (index < logs.length) { connectionLog.innerText += logs[index] + "\n"; index++; setTimeout(printLog, 150); }
-            else {
-                setTimeout(function() {
-                    hacknetLoader.classList.add("hidden"); hacknetContent.style.display = "flex";
-                    if (isTutorialActive && tutorialStep === 5) {
-                        tutorialStep = 6; guideText.innerText = "ИНСТРУКЦИЯ: Изучи вкладки 5chan, Shop и Wallet. Узнай свой баланс.";
-                        setTimeout(finishTutorial, 6000); 
-                    }
-                    updateUI();
-                }, 200);
-            }
-        }
-        printLog();
-    }
-
-    function sendBotMessage(text) {
-        const msg = document.createElement("div");
-        msg.className = "msg bot-msg"; msg.innerText = text;
-        chatMessages.appendChild(msg); chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function sendPlayerMessage(text) {
-        const msg = document.createElement("div");
-        msg.className = "msg player-msg"; msg.innerText = text;
-        chatMessages.appendChild(msg); chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function generateNewContract() {
-        if (isSleeping) return;
-        const types = ["написание майнера", "создание трояна", "доксинг чиновника", "взлом базы данных"];
-        const randomType = types[Math.floor(Math.random() * types.length)];
-        let repModifier = reputation / 100;
-        let basePrice = Math.floor((Math.random() * 11 + 9) * repModifier); // 9-19 BTC
-        if (basePrice < 5) basePrice = 5;
-
-        currentContract = { type: randomType, price: basePrice, basePrice: basePrice, haggleCount: 0, status: "pending" };
-        contractTimer = 0; 
-        sendBotMessage("BlackWork Bot: Новый контракт: [" + currentContract.type + "]. Гонорар: " + currentContract.price + " BTC. Берешь?");
-        renderChatActions();
-    }
-
-    function renderChatActions() {
-        chatActions.innerHTML = "";
-        if (!currentContract) return;
-
-        if (currentContract.status === "pending") {
-            const acceptBtn = document.createElement("button");
-            acceptBtn.className = "nav-btn"; acceptBtn.innerText = "ПРИНЯТЬ ЗАДАНИЕ";
-            acceptBtn.onclick = function() {
-                sendPlayerMessage("Я в деле."); currentContract.status = "active";
-                sendBotMessage("BlackWork Bot: Отлично. Переходи в NetBreaker и кликай кнопки.");
-                if (isTutorialActive && tutorialStep === 2) {
-                    tutorialStep = 3; guideText.innerText = "ИНСТРУКЦИЯ: Открой NetBreaker на рабочем столе для написания кода.";
-                }
-                renderChatActions();
-            };
-
-            const haggleBtn = document.createElement("button");
-            haggleBtn.className = "nav-btn"; haggleBtn.style.color = "#00f0ff"; haggleBtn.style.borderColor = "#00f0ff";
-            haggleBtn.innerText = "МНЕ МАЛО (ТОРГ)"; haggleBtn.onclick = function() { processHaggle(); };
-
-            const refuseBtn = document.createElement("button");
-            refuseBtn.className = "nav-btn cancel-btn"; refuseBtn.innerText = "ОТКЛОНИТЬ";
-            refuseBtn.onclick = function() {
-                if (isTutorialActive) return alert("Гид: В туториале нельзя отклонять контракт!");
-                sendPlayerMessage("Не интересно. Ищи другого.");
-                currentContract = null; chatActions.innerHTML = "";
-                setTimeout(generateNewContract, 4000);
-            };
-            chatActions.appendChild(acceptBtn); chatActions.appendChild(haggleBtn); chatActions.appendChild(refuseBtn);
-        } 
-        else if (currentContract.status === "active") {
-            chatActions.innerHTML = "<span style='color:#ffaa00; font-size:12px;'>Выполняется... Код пишется в NetBreaker.</span>";
-        } 
-        else if (currentContract.status === "compiled") {
-            const sendFileBtn = document.createElement("button");
-            sendFileBtn.className = "nav-btn"; sendFileBtn.style.borderColor = "#39ff14";
-            sendFileBtn.innerText = "📁 ОТПРАВИТЬ СКОМПИЛИРОВАННЫЙ ФАЙЛ";
-            sendFileBtn.onclick = function() {
-                sendPlayerMessage("Лови готовый файл.");
-                balance += currentContract.price; reputation = Math.min(200, reputation + 10); 
-                sendBotMessage("BlackWork Bot: Файл получен. Перевожу " + currentContract.price + " BTC. Отличная работа!");
-                currentContract = null; updateUI(); chatActions.innerHTML = "";
-                if (isTutorialActive && tutorialStep === 4) {
-                    tutorialStep = 5; guideText.innerText = "ИНСТРУКЦИЯ: Деньги на базе! Открой HackNet, чтобы проверить маркет.";
-                } else { setTimeout(generateNewContract, 4000); }
-            };
-            chatActions.appendChild(sendFileBtn);
-        }
-    }
-
-    function processHaggle() {
-        if (!currentContract) return;
-        currentContract.haggleCount++;
-        sendPlayerMessage("Риски выросли. Требую прибавки.");
-        let failChance = isTutorialActive ? 0 : currentContract.haggleCount * 0.35;
-        if (currentContract.price >= 30) {
-            sendBotMessage("BlackWork Bot: Больше 30 BTC я не дам."); return;
-        }
-        if (Math.random() < failChance) {
-            sendBotMessage("BlackWork Bot: Сделка отменена.");
-            reputation = Math.max(0, reputation - 5); currentContract = null; chatActions.innerHTML = ""; updateUI();
-            setTimeout(generateNewContract, 5000);
-        } else {
-            let bump = Math.floor(currentContract.price * 0.25);
-            currentContract.price = Math.min(30, currentContract.price + bump); 
-            sendBotMessage("BlackWork Bot: Повышаю до " + currentContract.price + " BTC. По рукам?");
-            renderChatActions();
-        }
-    }
-    window.selectVirusType = function(typeId) {
-        if (typeId > pcUpgradeLevel) return; 
-        selectedVirusId = typeId;
-        document.querySelectorAll('.virus-select-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById("virus-type-" + typeId).classList.add('active');
-
-        if (currentContract && currentContract.status === "active") {
-            compilerLog.innerText = "[NetBreaker] Ядро готово к кодингу.\n[НАЖИМАЙ ЛЮБЫЕ КЛАВИШИ НА КЛАВИАТУРЕ!]\n";
-            keyboardHint.classList.remove("hidden");
-        } else {
-            compilerLog.innerText = "[NetBreaker] Требуется активный контракт в Anongram.\n";
-            keyboardHint.classList.add("hidden");
-        }
-    };
-
-    document.addEventListener("keydown", function (event) {
-        const compilerWindow = document.getElementById("app-compiler");
-        if (compilerWindow.classList.contains("hidden") || !currentContract || currentContract.status !== "active") return;
-        if (event.repeat) return;
-
-        let speed = 5 * (pcUpgradeLevel + 1);
-        compileProgress = Math.min(100, compileProgress + speed);
-        compileBar.style.width = compileProgress + "%";
-
-        if (isTutorialActive && tutorialStep === 3) {
-            guideText.innerText = "ИНСТРУКЦИЯ: Нажимай кнопки, пока шкала не дойдет до 100%.";
-        }
-        compilerLog.innerText += "\nAnonymous@root:~# inject_payload_aes256_success_gate";
-        compilerLog.scrollTop = compilerLog.scrollHeight;
-
-        if (compileProgress >= 100) {
-            compileProgress = 0; compileBar.style.width = "0%"; keyboardHint.classList.add("hidden");
-            currentContract.status = "compiled"; stealth = Math.max(0, stealth - 12); 
-            compilerLog.innerText = "[SUCCESS] Сборка завершена!\n\n[ВНИМАНИЕ]: Закрой NetBreaker, зайди в Anongram и отправь файл.";
-            
-            if (isTutorialActive && tutorialStep === 3) {
-                tutorialStep = 4; guideText.innerText = "ИНСТРУКЦИЯ: Вирус готов! Закрой NetBreaker, вернись в Anongram и нажми 'ОТПРАВИТЬ СКОМПИЛИРОВАННЫЙ ФАЙЛ'.";
-            }
-            renderChatActions(); updateUI();
-        }
-    });
-
-    function finishTutorial() {
-        if (!isTutorialActive) return;
-        isTutorialActive = false; tutorialStep = 0;
-        guideText.innerHTML = "<span style='color:#39ff14;'>ОБУЧЕНИЕ ЗАВЕРШЕНО!</span> Запущен штат хакеров, следи за Скрытностью, Сном и Репутацией. Спи кнопкой 'ВЫКЛЮЧИТЬ ПК'.";
-        setTimeout(function() {
-            guideBox.classList.add("hidden");
-            document.querySelectorAll('.window').forEach(win => win.classList.add('hidden'));
-            sendBotMessage("BlackWork Bot: Инструктаж окончен. Высылаю первый реальный контракт.");
-            generateNewContract();
-        }, 8000);
-    }
-    window.buyMansion = function() {
-        if (balance >= 4500) {
-            balance -= 4500; reputation = 200;
-            document.getElementById("mansion-btn").disabled = true;
-            document.getElementById("mansion-btn").innerText = "КУПЛЕНО";
-            updateUI();
-            alert("ОСОБНЯК КУПЛЕН! Репутация взлетела до максимума (200 XP)!");
-        } else { alert("Недостаточно BTC!"); }
-    };
-
-    window.buyMaldives = function() {
-        if (balance >= 10000) {
-            balance -= 10000; isGameOver = true; clearInterval(clockInterval);
-            desktop.innerHTML = "<div class='modal-overlay' style='background:#000; z-index:999999;'><div class='modal-box' style='border-color:#00f0ff; box-shadow:0 0 50px #00f0ff; max-width:650px;'><h1 style='color:#00f0ff;'>🌴 МИССИЯ ВЫПОЛНЕНА</h1><p style='color:#ffffff; text-align:left; background:#07141a; padding:20px; border:1px solid #00f0ff; font-size:14px; line-height:1.8;'>[ТРАНЗАКЦИЯ УСПЕШНА]: Списано 10,000 BTC. Билет до Мальдив оформлен.<br><br>Вы успешно отмыли миллионы, обошли ловушки ФБР, оставив копов ни с чем. Жесткие диски уничтожены термитным зарядом.<br><br><strong>Поздравляем! Ты выиграл эту кибер-войну. Хакерская империя растворилась в сети, а ты улетел встречать закаты на океане.</strong></p><button class='nav-btn' style='border-color:#39ff14; color:#39ff14; margin-top:20px;' onclick='location.reload()'>СЫГРАТЬ ЕЩЕ РАЗ</button></div></div>";
-        } else { alert("Недостаточно BTC! Билет стоит 10000 BTC."); }
-    };
-
-    window.submitForumPost = function(optionId) {
-        if (!canPostToday) return;
-        canPostToday = false; postingZone.classList.add("hidden");
-        if (optionId === 1) { aggressionPoints += 30; stealth = Math.max(0, stealth - 20); } 
-        else if (optionId === 2) { aggressionPoints += 15; stealth = Math.max(0, stealth - 10); } 
-        else if (optionId === 3) { aggressionPoints = Math.max(0, aggressionPoints - 15); }
-        generateForumPosts(); updateUI();
-    };
-
-    window.switchTab = function (tabId) {
-        const allTabs = document.querySelectorAll('.tab-content');
-        const allTabButtons = document.querySelectorAll('.tab-btn');
-        allTabs.forEach(function(tab) { tab.classList.remove('active'); });
-        allTabButtons.forEach(function(btn) { btn.classList.remove('active'); });
-        document.getElementById(tabId).classList.add('active');
-    };
-
     function updateUI() {
+        if (!walletDisplay) return;
         walletDisplay.innerText = balance + " BTC";
         stealthDisplay.innerText = Math.round(stealth) + "%";
         stealthBar.style.width = stealth + "%";
@@ -381,70 +60,470 @@ document.addEventListener("DOMContentLoaded", function () {
         reputationDisplay.innerText = reputation + " XP";
         workersDisplay.innerText = workersCount + " ХАКЕРОВ";
         
-        if (stealth > 60) { stealthBar.style.backgroundColor = "#39ff14"; }
-        else if (stealth > 30) { stealthBar.style.backgroundColor = "#ffaa00"; }
-        else { stealthBar.style.backgroundColor = "#ff3333"; }
-
-        if (aggressionPoints > 50) { aggressionStatus.innerText = "КРИТИЧЕСКАЯ УГРОЗА"; aggressionStatus.style.color = "#ff3333"; }
-        else if (aggressionPoints > 20) { aggressionStatus.innerText = "РАЗДРАЖЕННЫЙ"; aggressionStatus.style.color = "#ffaa00"; }
-        else { aggressionStatus.innerText = "NEUTRAL"; aggressionStatus.style.color = "#00f0ff"; }
-    }
-
-    window.buyProtection = function (cost, amount) {
-        if (balance >= cost) {
-            balance -= cost; stealth = Math.min(100, stealth + amount); updateUI();
-            alert("Защита обновлена!"); generateForumPosts();
-        } else { alert("Недостаточно BTC!"); }
-    };
-
-    window.buyPCUpgrade = function (cost, typeId) {
-        if (balance >= cost) {
-            balance -= cost; pcUpgradeLevel = typeId;
-            document.getElementById("pc-item-" + typeId).disabled = true;
-            document.getElementById("pc-item-" + typeId).innerText = "КУПЛЕНО";
-            const lockedBtn = document.getElementById("virus-type-" + typeId);
-            lockedBtn.classList.remove("locked"); lockedBtn.disabled = false;
-            updateUI(); alert("Компоненты ПК обновлены!");
-        } else { alert("Недостаточно BTC!"); }
-    };
-
-    function generateForumPosts() {
-        forumThreads.innerHTML = "";
-        const goods = ["Анон: Anonymous гений взлома!", "Anon: Наша борда за свободный интернет!"];
-        const bads = ["Шпион: Киберполиция запустила трекеры логов.", "Хейтер: Ловите деанон Anonymous! Защита падает!"];
-        if (stealth < 50) {
-            forumThreads.innerHTML += "<div class='post' style='border-color:#ff3333; color:#ff8888;'><strong>🚨 УГРОЗА ФОРУМА:</strong> " + bads[Math.floor(Math.random() * bads.length)] + "</div>";
+        if (stealth > 60) {
+            stealthBar.style.backgroundColor = "#39ff14";
+        } else if (stealth > 30) {
+            stealthBar.style.backgroundColor = "#ffaa00";
         } else {
-            forumThreads.innerHTML += "<div class='post'><strong>🔗 ТРЕД:</strong> " + goods[Math.floor(Math.random() * goods.length)] + "</div>";
+            stealthBar.style.backgroundColor = "#ff3333";
+        }
+
+        if (aggressionPoints > 50) {
+            aggressionStatus.innerText = "КРИТИЧЕСКАЯ УГРОЗА";
+            aggressionStatus.style.color = "#ff3333";
+        } else if (aggressionPoints > 20) {
+            aggressionStatus.innerText = "РАЗДРАЖЕННЫЙ";
+            aggressionStatus.style.color = "#ffaa00";
+        } else {
+            aggressionStatus.innerText = "НЕЙТРАЛЬНАЯ";
+            aggressionStatus.style.color = "#00f0ff";
         }
     }
+    if (agreementCheckbox) {
+        agreementCheckbox.addEventListener("change", function () {
+            agreementBtn.disabled = !this.checked;
+        });
+    }
 
-    function passiveThreatLogic() {
-        if (isSleeping || isTutorialActive || isGameOver) return;
-        let baseReduction = (Math.random() * 3 + 2) / 60; 
-        let noiseModifier = workersCount * 0.05;
-        let finalModifier = hasQuantumPC ? 0.5 : 1.0;
-        
-        stealth = Math.max(0, stealth - (baseReduction + noiseModifier) * finalModifier);
-        let roundedStealth = Math.round(stealth);
-
-        if (roundedStealth < 50 && roundedStealth >= 30) {
-            if (Math.random() < 0.05) generateForumPosts(); 
-        } else if (roundedStealth < 30 && roundedStealth > 0) {
-            threatContact.classList.remove("hidden");
-            if (Math.random() < 0.04) {
-                const threatMsg = document.createElement("div"); threatMsg.className = "msg threat-msg";
-                threatMsg.innerText = "ENEMY_HACKER: Твой кошелек под угрозой. Копы выехали.";
-                chatMessages.appendChild(threatMsg); chatMessages.scrollTop = chatMessages.scrollHeight;
+    if (agreementBtn) {
+        agreementBtn.addEventListener("click", function () {
+            if (agreementCheckbox.checked) {
+                agreementModal.classList.add("hidden");
+                tutorialModal.classList.remove("hidden");
             }
-        } else if (roundedStealth <= 0) { triggerGameOver(); }
+        });
+    }
+
+    window.closeTutorial = function (startTutorial) {
+        tutorialModal.classList.add("hidden");
+        desktop.classList.remove("blurred");
+        
+        if (startTutorial) {
+            isTutorialActive = true;
+            tutorialStep = 1;
+            guideBox.classList.remove("hidden");
+            guideText.innerText = "ИНСТРУКЦИЯ: Нажмите на приложение Anongram. Другие ярлыки заблокированы.";
+            sendBotMessage("Система: Запущен интерактивный режим обучения.");
+        } else {
+            sendBotMessage("BlackWork Bot: Работаешь соло? Первые контракты уже в чате.");
+            generateNewContract();
+        }
+        
+        clockInterval = setInterval(updateGameClock, 1000);
+        setInterval(passiveThreatLogic, 1000);
+    };
+
+    function updateGameClock() {
+        if (isSleeping || isGameOver) return;
+        gameMinute += 1;
+        
+        if (currentContract && currentContract.status === "pending") {
+            contractTimer += 1;
+            if (contractTimer > 20) {
+                reputation = Math.max(0, reputation - 2);
+                updateUI();
+            }
+        }
+
+        if (gameMinute >= 60) {
+            gameMinute = 0;
+            gameHour += 1;
+            fatigue = Math.min(100, fatigue + 4);
+            if (fatigue >= 100) {
+                triggerFaint();
+            }
+            if (workersCount > 0) {
+                balance += workersCount * 5;
+                sendBotMessage("Система: Штат принес пассивный доход +" + (workersCount * 5) + " BTC.");
+            }
+            if (gameHour >= 24) {
+                gameHour = 0;
+                canPostToday = true;
+                postingZone.classList.remove("hidden");
+            }
+        }
+        gameClock.innerText = String(gameHour).padStart(2, '0') + ":" + String(gameMinute).padStart(2, '0');
+        updateUI();
+    }
+    window.toggleSleep = function() {
+        if (isTutorialActive) return alert("Гид: Сон заблокирован в туториале!");
+        if (currentContract && currentContract.status === "active") return alert("Нельзя спать во время кодинга!");
+        isSleeping = true;
+        sleepScreen.classList.remove("hidden");
+        setTimeout(function() {
+            fatigue = 0;
+            gameHour = (gameHour + 8) % 24;
+            isSleeping = false;
+            sleepScreen.classList.add("hidden");
+            sendBotMessage("BlackWork Bot: С силами порядок. Жду вирусы.");
+            if (!currentContract) generateNewContract();
+            updateUI();
+        }, 3000); 
+    };
+
+    function triggerFaint() {
+        alert("Обморок! Штраф -30% BTC за срочное лечение.");
+        balance = Math.floor(balance * 0.7);
+        fatigue = 30;
+        gameHour = (gameHour + 10) % 24;
         updateUI();
     }
 
-    function triggerGameOver() {
-        clearInterval(clockInterval);
-        desktop.innerHTML = "<div class='modal-overlay' style='background:#000; z-index:99999;'><div class='modal-box' style='border-color:#ff3333; box-shadow:0 0 40px #ff3333;'><h1 style='color:#ff3333;'>🛑 ОБЛАВА ПОЛИЦИИ</h1><p style='color:#ff8888; text-align:left; background:#1a0505; padding:15px; border:1px solid #551111;'>[ОШИБКА ДЕАНOНИМИЗАЦИИ]: Ваша скрытность упала до 0%. Спецслужбы отследили адрес шлюза.<br><br><strong>Штурмовой отряд киберполиции выбил вашу дверь. Вы арестованы.</strong></p><button class='nav-btn' style='border-color:#fff; color:#fff;' onclick='location.reload()'>НАЧАТЬ СНАЧАЛА</button></div></div>";
+    window.openApp = function (appName) {
+        if (isTutorialActive) {
+            if (tutorialStep === 1 && appName !== "anongram") return alert("Гид: Открой Anongram!");
+            if (tutorialStep === 3 && appName !== "compiler") return alert("Гид: Открой NetBreaker!");
+            if (tutorialStep === 5 && appName !== "hacknet") return alert("Гид: Открой HackNet!");
+        }
+        const appWindow = document.getElementById("app-" + appName);
+        if (!appWindow) return;
+        appWindow.classList.remove("hidden");
+        
+        if (appName === "anongram" && isTutorialActive && tutorialStep === 1) {
+            tutorialStep = 2;
+            guideText.innerText = "ИНСТРУКЦИЯ: Прими заказ бота или нажми 'Торг'.";
+            generateNewContract();
+        }
+        if (appName === "hacknet") {
+            hacknetContent.style.display = "none";
+            hacknetLoader.classList.remove("hidden");
+            runProxyLoader();
+        }
+        if (appName === "compiler") {
+            selectVirusType(selectedVirusId);
+        }
+    };
+
+    window.closeApp = function (appName) {
+        if (isTutorialActive && tutorialStep === 3 && appName === "compiler") {
+            alert("Гид: Допиши вирус до 100%!");
+            return;
+        }
+        const appWindow = document.getElementById("app-" + appName);
+        if (appWindow) appWindow.classList.add("hidden");
+    };
+    function runProxyLoader() {
+        connectionLog.innerText = ""; 
+        const logs = ["[SYSTEM] Шлюз...", "[PROXY] Мальдивы... Ок", "[VPN] AES-256... Ок", "[TOR] Луковые узлы... Ок", "[SUCCESS] Вход разрешен."];
+        let index = 0;
+        function printLog() {
+            if (index < logs.length) { 
+                connectionLog.innerText += logs[index] + "\n"; 
+                index++; 
+                setTimeout(printLog, 120); 
+            } else {
+                setTimeout(function() {
+                    hacknetLoader.classList.add("hidden"); 
+                    hacknetContent.style.display = "flex";
+                    if (isTutorialActive && tutorialStep === 5) { 
+                        tutorialStep = 6; 
+                        guideText.innerText = "ИНСТРУКЦИЯ: Изучи вкладки 5chan, Shop и Wallet."; 
+                        setTimeout(finishTutorial, 5000); 
+                    }
+                    updateUI();
+                }, 150);
+            }
+        }
+        printLog();
     }
 
+    function sendBotMessage(text) { 
+        const msg = document.createElement("div"); 
+        msg.className = "msg bot-msg"; 
+        msg.innerText = text; 
+        chatMessages.appendChild(msg); 
+        chatMessages.scrollTop = chatMessages.scrollHeight; 
+    }
+
+    function sendPlayerMessage(text) { 
+        const msg = document.createElement("div"); 
+        msg.className = "msg player-msg"; 
+        msg.innerText = text; 
+        chatMessages.appendChild(msg); 
+        chatMessages.scrollTop = chatMessages.scrollHeight; 
+    }
+
+    function generateNewContract() {
+        if (isSleeping) return; 
+        const types = ["написание майнера", "создание трояна", "взлом базы данных"]; 
+        const randomType = types[Math.floor(Math.random() * types.length)];
+        let basePrice = Math.floor((Math.random() * 11 + 9) * (reputation / 100)); 
+        if (basePrice < 5) basePrice = 5;
+        
+        currentContract = { 
+            type: randomType, 
+            price: basePrice, 
+            basePrice: basePrice, 
+            haggleCount: 0, 
+            status: "pending" 
+        }; 
+        contractTimer = 0;
+        sendBotMessage("BlackWork Bot: Контракт [" + currentContract.type + "]. Гонорар: " + currentContract.price + " BTC. Берешь?"); 
+        renderChatActions();
+    }
+    function renderChatActions() {
+        chatActions.innerHTML = ""; 
+        if (!currentContract) return;
+        
+        if (currentContract.status === "pending") {
+            const acceptBtn = document.createElement("button"); 
+            acceptBtn.className = "nav-btn"; 
+            acceptBtn.innerText = "ПРИНЯТЬ";
+            acceptBtn.onclick = function() {
+                sendPlayerMessage("Я в деле."); 
+                currentContract.status = "active"; 
+                sendBotMessage("BlackWork Bot: Отлично. Кликай буквы в NetBreaker.");
+                if (isTutorialActive && tutorialStep === 2) { 
+                    tutorialStep = 3; 
+                    guideText.innerText = "ИНСТРУКЦИЯ: Открой NetBreaker и пиши код."; 
+                }
+                renderChatActions();
+            };
+
+            const haggleBtn = document.createElement("button"); 
+            haggleBtn.className = "nav-btn"; 
+            haggleBtn.style.color = "#00f0ff"; 
+            haggleBtn.innerText = "ТОРГ"; 
+            haggleBtn.onclick = function() { processHaggle(); };
+
+            const refuseBtn = document.createElement("button"); 
+            refuseBtn.className = "nav-btn cancel-btn"; 
+            refuseBtn.innerText = "ОТКАЗ";
+            refuseBtn.onclick = function() { 
+                if (isTutorialActive) return alert("Гид: Прими контракт!"); 
+                sendPlayerMessage("Отказ."); 
+                currentContract = null; 
+                chatActions.innerHTML = ""; 
+                setTimeout(generateNewContract, 4000); 
+            };
+
+            chatActions.appendChild(acceptBtn); 
+            chatActions.appendChild(haggleBtn); 
+            chatActions.appendChild(refuseBtn);
+        } else if (currentContract.status === "active") { 
+            chatActions.innerHTML = "<span>Код пишется в NetBreaker...</span>"; 
+        } else if (currentContract.status === "compiled") {
+            const fBtn = document.createElement("button"); 
+            fBtn.className = "nav-btn"; 
+            fBtn.innerText = "📁 ОТПРАВИТЬ ФАЙЛ";
+            fBtn.onclick = function() {
+                sendPlayerMessage("Лови файл."); 
+                balance += currentContract.price; 
+                reputation = Math.min(200, reputation + 10);
+                sendBotMessage("BlackWork Bot: Получено. Перевожу " + currentContract.price + " BTC."); 
+                currentContract = null; 
+                updateUI(); 
+                chatActions.innerHTML = "";
+                if (isTutorialActive && tutorialStep === 4) { 
+                    tutorialStep = 5; 
+                    guideText.innerText = "ИНСТРУКЦИЯ: Открой браузер HackNet."; 
+                } else { 
+                    setTimeout(generateNewContract, 4000); 
+                }
+            };
+            chatActions.appendChild(fBtn);
+        }
+    }
+
+    function processHaggle() {
+        if (!currentContract) return; 
+        currentContract.haggleCount++; 
+        sendPlayerMessage("Мало денег.");
+        if (currentContract.price >= 30) return sendBotMessage("BlackWork Bot: 30 BTC — мой макс. потолок.");
+        
+        let failChance = isTutorialActive ? 0 : currentContract.haggleCount * 0.35;
+        if (Math.random() < failChance) { 
+            sendBotMessage("BlackWork Bot: Сделка отменена."); 
+            reputation = Math.max(0, reputation - 5); 
+            currentContract = null; 
+            chatActions.innerHTML = ""; 
+            updateUI(); 
+            setTimeout(generateNewContract, 5000); 
+        } else { 
+            currentContract.price = Math.min(30, currentContract.price + Math.floor(currentContract.price * 0.25)); 
+            sendBotMessage("BlackWork Bot: Повышаю до " + currentContract.price + " BTC. По рукам?"); 
+            renderChatActions(); 
+        }
+    }
+    window.selectVirusType = function(typeId) {
+        if (typeId > pcUpgradeLevel) return; 
+        selectedVirusId = typeId; 
+        document.querySelectorAll('.virus-select-btn').forEach(b => b.classList.remove('active')); 
+        document.getElementById("virus-type-" + typeId).classList.add('active');
+        
+        if (currentContract && currentContract.status === "active") { 
+            compilerLog.innerText = "[NetBreaker] Жду кодинг...\n[НАЖИМАЙ КЛАВИШИ НА КЛАВИАТУРЕ!]\n"; 
+            keyboardHint.classList.remove("hidden"); 
+        } else { 
+            compilerLog.innerText = "[NetBreaker] Нужен контракт.\n"; 
+            keyboardHint.classList.add("hidden"); 
+        }
+    };
+
+    document.addEventListener("keydown", function (e) {
+        const win = document.getElementById("app-compiler"); 
+        if (win.classList.contains("hidden") || !currentContract || currentContract.status !== "active" || e.repeat) return;
+        
+        compileProgress = Math.min(100, compileProgress + 5 * (pcUpgradeLevel + 1)); 
+        compileBar.style.width = compileProgress + "%";
+        
+        if (isTutorialActive && tutorialStep === 3) guideText.innerText = "ИНСТРУКЦИЯ: Нажимай кнопки до 100%.";
+        
+        compilerLog.innerText += "\nAnonymous@root:~# inject_payload_gate_aes256_success"; 
+        compilerLog.scrollTop = compilerLog.scrollHeight;
+        
+        if (compileProgress >= 100) {
+            compileProgress = 0; 
+            compileBar.style.width = "0%"; 
+            keyboardHint.classList.add("hidden"); 
+            currentContract.status = "compiled"; 
+            stealth = Math.max(0, stealth - 12);
+            compilerLog.innerText = "[SUCCESS] Сборка готова! Закрой NetBreaker и отправь файл в Anongram.";
+            
+            if (isTutorialActive && tutorialStep === 3) { 
+                tutorialStep = 4; 
+                guideText.innerText = "ИНСТРУКЦИЯ: Закрой NetBreaker крестиком и отправь файл в чате."; 
+            }
+            renderChatActions(); 
+            updateUI();
+        }
+    });
+    function finishTutorial() {
+        if (!isTutorialActive) return; 
+        isTutorialActive = false; 
+        tutorialStep = 0; 
+        guideText.innerHTML = "<span>ТУТОРИАЛ ЗАВЕРШЕН!</span> Следи за Скрытностью, Сном и Репутацией. Нанимай хакеров в Shop.";
+        setTimeout(function() { 
+            guideBox.classList.add("hidden"); 
+            document.querySelectorAll('.window').forEach(w => w.classList.add('hidden')); 
+            sendBotMessage("BlackWork Bot: Начнем работу. Высылаю контракт."); 
+            generateNewContract(); 
+        }, 6000);
+    }
+
+    window.buyWorker = function() {
+        if (balance >= 500) { 
+            balance -= 500; 
+            workersCount += 1; 
+            updateUI(); 
+            alert("Реферал нанят! (+5 BTC/час)"); 
+        } else { 
+            alert("Мало BTC!"); 
+        }
+    };
+
+    window.buyQuantumPC = function() {
+        if (balance >= 1500) { 
+            balance -= 1500; 
+            hasQuantumPC = true; 
+            document.getElementById("quantum-pc-btn").disabled = true; 
+            document.getElementById("quantum-pc-btn").innerText = "ON"; 
+            updateUI(); 
+            alert("AI-Quantum запущен! Слежка х2 меньше."); 
+        } else { 
+            alert("Мало BTC!"); 
+        }
+    };
+
+    window.buyMansion = function() {
+        if (balance >= 4500) { 
+            balance -= 4500; 
+            reputation = 200; 
+            document.getElementById("mansion-btn").disabled = true; 
+            updateUI(); 
+            alert("Особняк куплен! Репутация 200 XP!"); 
+        } else { 
+            alert("Мало BTC!"); 
+        }
+    };
+    window.buyMaldives = function() {
+        if (balance >= 10000) {
+            balance -= 10000; 
+            isGameOver = true; 
+            clearInterval(clockInterval);
+            desktop.innerHTML = "<div class='modal-overlay' style='background:#000; z-index:999999;'><div class='modal-box' style='border-color:#00f0ff;'><h1 style='color:#00f0ff;'>🌴 МИССИЯ ВЫПОЛНЕНА</h1><p style='color:#fff; text-align:left;'>Вы отмыли миллионы, купили билет до Мальдив и обошли ловушки ФБР. Жесткие диски сожжены термитом.<br><br><strong>Anonymous, ты выиграл эту кибер-войну! Твоя хакерская империя ушла в тень, а ты улетел встречать закаты на океане.</strong></p><button class='nav-btn' onclick='location.reload()'>ЕЩЕ РАЗ</button></div></div>";
+        } else { 
+            alert("Мало BTC! Билет стоит 10000 BTC."); 
+        }
+    };
+
+    window.submitForumPost = function(id) { 
+        if (!canPostToday) return; 
+        canPostToday = false; 
+        postingZone.classList.add("hidden"); 
+        if (id === 1) { aggressionPoints += 30; stealth = Math.max(0, stealth - 20); } 
+        else if (id === 2) { aggressionPoints += 15; stealth = Math.max(0, stealth - 10); } 
+        else if (id === 3) { aggressionPoints = Math.max(0, aggressionPoints - 15); } 
+        generateForumPosts(); 
+        updateUI(); 
+    };
+
+    window.switchTab = function (id) { 
+        const tabs = document.querySelectorAll('.tab-content'); 
+        const btns = document.querySelectorAll('.tab-btn'); 
+        tabs.forEach(t => t.classList.remove('active')); 
+        btns.forEach(b => b.classList.remove('active')); 
+        document.getElementById(id).classList.add('active'); 
+    };
+
+    window.buyProtection = function (cost, am) { 
+        if (balance >= cost) { 
+            balance -= cost; 
+            stealth = Math.min(100, stealth + am); 
+            updateUI(); 
+            alert("Защита куплена!"); 
+            generateForumPosts(); 
+        } else { 
+            alert("Мало BTC!"); 
+        } 
+    };
+
+    window.buyPCUpgrade = function (cost, id) { 
+        if (balance >= cost) { 
+            balance -= cost; 
+            pcUpgradeLevel = id; 
+            document.getElementById("pc-item-" + id).disabled = true; 
+            document.getElementById("pc-item-" + id).innerText = "OK"; 
+            const b = document.getElementById("virus-type-" + id); 
+            b.classList.remove("locked"); 
+            b.disabled = false; 
+            updateUI(); 
+            alert("ПК обновлен!"); 
+        } else { 
+            alert("Мало BTC!"); 
+        } 
+    };
+    
+    function generateForumPosts() { 
+        forumThreads.innerHTML = ""; 
+        const g = ["Анон: Anonymous гений взлома!", "Anon: Наша борда за свободный нет!"]; 
+        const b = ["Шпион: Киберполиция запустила трекеры.", "Хейтер: Защита Anonymous падает!"]; 
+        if (stealth < 50) forumThreads.innerHTML += "<div class='post' style='border-color:#f33; color:#ff8888;'><strong>🚨 УГРОЗА:</strong> " + b[Math.floor(Math.random() * b.length)] + "</div>"; 
+        else forumThreads.innerHTML += "<div class='post'><strong>🔗 ТРЕД:</strong> " + g[Math.floor(Math.random() * g.length)] + "</div>"; 
+    }
+    
+    function passiveThreatLogic() {
+        if (isSleeping || isTutorialActive || isGameOver) return;
+        stealth = Math.max(0, stealth - ((Math.random() * 3 + 2) / 60 + workersCount * 0.05) * (hasQuantumPC ? 0.5 : 1.0)); 
+        let rs = Math.round(stealth);
+        if (rs < 50 && rs >= 30) { 
+            if (Math.random() < 0.05) generateForumPosts(); 
+        } else if (rs < 30 && rs > 0) { 
+            threatContact.classList.remove("hidden"); 
+            if (Math.random() < 0.04) { 
+                const m = document.createElement("div"); m.className = "msg threat-msg"; m.innerText = "ENEMY: Кошелек под угрозой. Копы близко."; 
+                chatMessages.appendChild(m); chatMessages.scrollTop = chatMessages.scrollHeight; 
+            } 
+        } else if (rs <= 0) { 
+            triggerGameOver(); 
+        } 
+        updateUI();
+    }
+    
+    function triggerGameOver() { 
+        clearInterval(clockInterval); 
+        desktop.innerHTML = "<div class='modal-overlay' style='background:#000; z-index:99999;'><div class='modal-box' style='border-color:#f33;'><h1 style='color:#f33;'>🛑 ОБЛАВА ПОЛИЦИИ</h1><p style='color:#ff8888; text-align:left;'>Скрытность 0%. Спецслужбы отследили адрес шлюза.<br><br><strong>Штурмовой отряд киберполиции выбил вашу дверь. Вы арестованы. Империя пала.</strong></p><button class='nav-btn' onclick='location.reload()'>НАЧАТЬ СНАЧАЛА</button></div></div>"; 
+    }
+    
     updateUI();
 });
