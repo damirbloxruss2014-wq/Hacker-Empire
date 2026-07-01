@@ -13,7 +13,7 @@
         <div class="modal-box hacker-theme">
             <h2>🚨 СИСТЕМНОЕ ПРЕДУПРЕЖДЕНИЕ</h2>
             <div class="modal-text">
-                ВНИМАНИЕ: Данный ресурс является симулятором виртуального взлома Hacker Empire и носит исключительно развлекательный характер. Все совершаемые действия, скрипты, «вирусы» и атаки внутри игры являются имитацией кода и не наносят реального вреда компьютерам, сетям или пользователям интернета. Создатели проекта выступают против реального кибертерроризма.
+                ВНИМАНИЕ: Данный ресурс является симулятором виртуального взлома Hacker Empire и носит исключительно развлекательный и юмористический характер. Все совершаемые действия, скрипты, «вирусы» и атаки внутри игры являются имитацией кода и не наносят реального вреда компьютерам, сетям или пользователям интернета. Создатели проекта выступают против реального кибертерроризма.
             </div>
             <div class="modal-checkbox-zone">
                 <label class="checkbox-container">
@@ -57,11 +57,93 @@
             </div>
         </div>
 
-        <!-- Нижняя панель (Таскбар) -->
+        <!-- ОКНО: ANONGRAM -->
+        <div id="app-anongram" class="window hidden">
+            <div class="window-header">
+                <span>💬 Anongram Messenger (v1.4)</span>
+                <button class="close-window-btn" onclick="closeApp('anongram')">×</button>
+            </div>
+            <div class="window-body anongram-layout">
+                <div class="chat-sidebar">
+                    <div class="chat-contact active">🤖 BlackWork Bot</div>
+                    <div class="chat-contact threat hidden" id="threat-contact">⚠️ UNKNOWN</div>
+                </div>
+                <div class="chat-area">
+                    <div class="chat-messages" id="chat-messages-box">
+                        <div class="msg system-msg">Сессия шифрования установлена. Вы вошли как Anonymous.</div>
+                    </div>
+                    <div class="chat-actions" id="chat-actions-zone">
+                        <!-- Сюда JS будет подставлять кнопки выбора заданий или торговли -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ОКНО: HACKNET (БРАУЗЕР) -->
+        <div id="app-hacknet" class="window hidden">
+            <div class="window-header">
+                <span>🌐 HackNet Secure Browser</span>
+                <button class="close-window-btn" onclick="closeApp('hacknet')">×</button>
+            </div>
+            
+            <!-- Экран загрузки Прокси/VPN -->
+            <div id="hacknet-loader" class="hacknet-connection-screen hidden">
+                <div class="connection-log" id="connection-log-box"></div>
+            </div>
+
+            <!-- Контент браузера -->
+            <div id="hacknet-content" class="window-body hacknet-layout">
+                <div class="browser-tabs">
+                    <button class="tab-btn active" onclick="switchTab('tab-5chan')">5chan</button>
+                    <button class="tab-btn" onclick="switchTab('tab-shop')">Upgrade Shop</button>
+                    <button class="tab-btn" onclick="switchTab('tab-wallet')">My Wallet</button>
+                </div>
+                
+                <div class="browser-body">
+                    <!-- Вкладка: 5chan -->
+                    <div id="tab-5chan" class="tab-content active">
+                        <div class="forum-banner">БОРДА //5CHAN// — СВОБОДА СЛОВА</div>
+                        <div class="forum-threads" id="forum-threads-box">
+                            <div class="post"><strong>Анон:</strong> Кто-то слышал про нового хакера? Говорят, вчера положили сервак банка. Очередной скрипт-кидди наверно.</div>
+                        </div>
+                    </div>
+
+                    <!-- Вкладка: Магазин -->
+                    <div id="tab-shop" class="tab-content">
+                        <h3>ДАРКНЕТ МАРКЕТ</h3>
+                        <div class="shop-grid">
+                            <div class="shop-card">
+                                <h4>Пакет Прокси & VPN PRO</h4>
+                                <p>Защита личности: +25%</p>
+                                <button class="buy-btn" onclick="buyProtection(150, 25)">150 BTC</button>
+                            </div>
+                            <div class="shop-card">
+                                <h4>Разгон процессора v2</h4>
+                                <p>Качество вирусов: +20%</p>
+                                <button class="buy-btn" onclick="buyPCUpgrade(300)">300 BTC</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Вкладка: Кошелек -->
+                    <div id="tab-wallet" class="tab-content">
+                        <h3>КРИПТОКОШЕЛЕК В СЕТИ TOR</h3>
+                        <div class="wallet-box">
+                            <span class="wallet-label">Текущий баланс:</span>
+                            <span class="wallet-value" id="wallet-display">0 BTC</span>
+                        </div>
+                        <div class="wallet-status">
+                            <span>Уровень защиты: <strong id="anon-display">100%</strong></span>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" id="anon-bar" style="width: 100%"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижняя панель -->
         <footer class="taskbar">
             <div class="start-btn">⚙️ SYSTEM</div>
-            
-            <!-- Правый нижний угол: Игровые часы -->
             <div class="system-tray">
                 <div id="game-clock" class="clock">09:00</div>
             </div>
