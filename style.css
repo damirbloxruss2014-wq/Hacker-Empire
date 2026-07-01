@@ -16,6 +16,32 @@ body {
     transition: filter 0.4s ease;
 }
 
+/* НЕОНОВАЯ ПЛАШКА ГИДА ТУТОРИАЛА */
+.guide-badge {
+    position: fixed;
+    top: 20px;
+    right: 30px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px dashed #00f0ff;
+    padding: 12px 20px;
+    border-radius: 12px;
+    color: #00f0ff;
+    font-size: 13px;
+    font-weight: bold;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+    z-index: 9999;
+    max-width: 320px;
+    line-height: 1.4;
+}
+.guide-pulse {
+    color: #ff007f;
+    animation: guideBlink 1s infinite alternate;
+}
+@keyframes guideBlink {
+    0% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
 /* ЭКРАН СНА */
 .sleep-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -61,79 +87,3 @@ body {
 .close-window-btn { background: transparent; border: none; color: #ff3333; font-size: 20px; cursor: pointer; }
 .close-window-btn:hover { color: #fff; }
 .window-body { flex: 1; display: flex; overflow: hidden; background: #020203; }
-
-/* ANONGRAM */
-.anongram-layout { display: flex; width: 100%; height: 100%; }
-.chat-sidebar { width: 30%; background: #09090f; border-right: 1px solid #152515; display: flex; flex-direction: column; }
-.chat-contact { padding: 15px; border-bottom: 1px solid #112211; font-size: 13px; color: #888; cursor: pointer; }
-.chat-contact.active { background: rgba(57, 255, 20, 0.08); color: #39ff14; font-weight: bold; border-left: 3px solid #39ff14; }
-.chat-contact.threat { color: #ff3333; border-left: 3px solid #ff3333; font-weight: bold; }
-.chat-area { width: 70%; display: flex; flex-direction: column; background: #030305; }
-.chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-size: 13px; }
-.msg { padding: 10px 14px; border-radius: 8px; max-width: 80%; line-height: 1.5; }
-.msg.system-msg { background: rgba(0, 240, 255, 0.05); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.2); align-self: center; text-align: center; font-size: 11px; }
-.msg.bot-msg { background: #0e1a0e; color: #39ff14; border: 1px solid #1a3a1a; align-self: flex-start; }
-.msg.player-msg { background: #111; color: #fff; border: 1px solid #333; align-self: flex-end; }
-.msg.threat-msg { background: rgba(255, 51, 51, 0.08); color: #ff3333; border: 1px solid #551111; align-self: flex-start; }
-.chat-actions { padding: 15px; background: #09090f; border-top: 1px solid #152515; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
-/* HACKNET БРАУЗЕР */
-.hacknet-layout { display: flex; flex-direction: column; width: 100%; height: 100%; }
-.browser-tabs { display: flex; background: #09090f; border-bottom: 1px solid #152515; }
-.tab-btn { background: transparent; border: none; color: #666; padding: 12px 20px; font-family: inherit; font-size: 13px; cursor: pointer; }
-.tab-btn.active { color: #39ff14; border-bottom: 2px solid #39ff14; font-weight: bold; background: rgba(57, 255, 20, 0.03); }
-.browser-body { flex: 1; padding: 20px; overflow-y: auto; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
-/* ЕЖЕДНЕВНЫЕ ПОСТЫ НА 5CHAN */
-.forum-action-box { background: #090e09; border: 1px solid #113311; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-.forum-action-box h4 { margin: 0 0 12px 0; font-size: 11px; color: #88ff88; letter-spacing: 1px; }
-.forum-options-grid { display: flex; flex-direction: column; gap: 8px; }
-.post-opt-btn { background: #020202; border: 1px solid #224422; color: #bbb; padding: 8px 12px; font-family: inherit; font-size: 11px; text-align: left; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
-.post-opt-btn:hover { border-color: #39ff14; color: #39ff14; background: rgba(57,255,20,0.02); }
-
-.forum-banner { background: #1a0505; color: #ff3333; border: 1px solid #551111; padding: 10px; font-weight: bold; text-align: center; font-size: 12px; margin-bottom: 15px; }
-.forum-threads { display: flex; flex-direction: column; gap: 15px; }
-.forum-threads .post { background: #0a0a0f; border: 1px solid #1a1a26; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.6; color: #bbb; }
-.forum-threads .post strong { color: #00f0ff; }
-
-.shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-.shop-card { background: #080d08; border: 1px solid #113311; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px; }
-.shop-card h4 { margin: 0; font-size: 13px; color: #fff; }
-.shop-card p { margin: 0; font-size: 11px; color: #666; }
-.buy-btn { background: #000; color: #39ff14; border: 1px solid #39ff14; padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: bold; border-radius: 4px; align-self: flex-start; margin-top: 5px; }
-.buy-btn:hover { background: #39ff14; color: #000; }
-.wallet-box { background: #09090f; border: 1px solid #222; padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-.wallet-label { font-size: 14px; color: #888; }
-.wallet-value { font-size: 22px; font-weight: bold; color: #00f0ff; }
-.hacknet-connection-screen { position: absolute; top: 38px; left: 0; width: 100%; height: calc(100% - 38px); background: #000; z-index: 150; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
-.connection-log { font-size: 13px; line-height: 1.7; color: #39ff14; }
-
-/* NETBREAKER ИНТЕРФЕЙС */
-.compiler-layout { display: flex; width: 100%; height: 100%; }
-.compiler-sidebar { width: 35%; background: #09090f; border-right: 1px solid #152515; padding: 15px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; }
-.compiler-sidebar h4 { margin: 0 0 5px 0; font-size: 11px; color: #666; }
-.virus-select-btn { background: #020202; border: 1px solid #224422; color: #888; padding: 12px; font-family: inherit; font-size: 11px; text-align: left; cursor: pointer; border-radius: 6px; width: 100%; }
-.virus-select-btn.active { border-color: #39ff14; color: #39ff14; background: rgba(57,255,20,0.05); font-weight: bold; }
-.virus-select-btn.locked { border-color: #222; color: #444; cursor: not-allowed; }
-
-.compiler-work-zone { width: 65%; padding: 15px; display: flex; flex-direction: column; background: #030305; box-sizing: border-box; }
-.compiler-display { flex: 1; background: #000; border: 1px solid #112211; border-radius: 6px; padding: 15px; margin-bottom: 15px; overflow-y: auto; height: 180px; }
-.compiler-log { font-size: 11px; color: #88ff88; line-height: 1.5; white-space: pre-wrap; font-family: monospace; }
-
-/* ТАСКБАР И ПОЛОСКИ С СКРЫТНОСТЬЮ */
-.taskbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 45px; background: rgba(10, 10, 10, 0.9); border-top: 1px solid #224422; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-sizing: border-box; z-index: 500; }
-.start-btn { background: #111; border: 1px solid #39ff14; padding: 5px 12px; font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer; color: #39ff14; }
-.start-btn:hover { background: #39ff14; color: #000; }
-.taskbar-indicators { display: flex; align-items: center; gap: 20px; }
-.indicator-group { display: flex; align-items: center; gap: 10px; }
-.ind-label { font-size: 10px; font-weight: bold; color: #888; }
-.ind-value { font-size: 11px; font-weight: bold; width: 35px; text-align: right; }
-.ind-bar { width: 100px; height: 8px !important; }
-
-.system-tray { background: #000; border: 1px solid #113311; padding: 5px 15px; border-radius: 6px; }
-.clock { font-size: 14px; font-weight: bold; color: #39ff14; text-shadow: 0 0 5px #39ff14; letter-spacing: 1px; }
-
-.progress-bar-bg { width: 100%; height: 10px; background: #111; border: 1px solid #224422; border-radius: 4px; overflow: hidden; }
-.progress-bar-fill { height: 100%; background: #39ff14; box-shadow: 0 0 8px #39ff14; transition: width 0.1s ease; }
-.hidden { display: none !important; }
