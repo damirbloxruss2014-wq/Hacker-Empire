@@ -16,6 +16,20 @@ body {
     transition: filter 0.4s ease;
 }
 
+/* ЭКРАН СНА */
+.sleep-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #000000; display: flex; justify-content: center;
+    align-items: center; z-index: 99999; opacity: 1; transition: opacity 0.5s ease;
+}
+.sleep-box { text-align: center; color: #00f0ff; font-weight: bold; }
+.zzz-animation { font-size: 36px; text-shadow: 0 0 10px #00f0ff; animation: sleepPulse 2s infinite; }
+@keyframes sleepPulse {
+    0% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.3; }
+}
+
 /* МОДАЛЬНЫЕ ОКНА */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 9999; }
 .modal-overlay.hidden { display: none !important; }
@@ -89,7 +103,6 @@ body {
 .shop-card p { margin: 0; font-size: 11px; color: #666; }
 .buy-btn { background: #000; color: #39ff14; border: 1px solid #39ff14; padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: bold; border-radius: 4px; align-self: flex-start; margin-top: 5px; }
 .buy-btn:hover { background: #39ff14; color: #000; }
-
 .wallet-box { background: #09090f; border: 1px solid #222; padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
 .wallet-label { font-size: 14px; color: #888; }
 .wallet-value { font-size: 22px; font-weight: bold; color: #00f0ff; }
@@ -100,27 +113,27 @@ body {
 .compiler-layout { display: flex; width: 100%; height: 100%; }
 .compiler-sidebar { width: 35%; background: #09090f; border-right: 1px solid #152515; padding: 15px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; }
 .compiler-sidebar h4 { margin: 0 0 5px 0; font-size: 11px; color: #666; }
-.virus-select-btn { background: #020202; border: 1px solid #224422; color: #888; padding: 12px; font-family: inherit; font-size: 11px; text-align: left; cursor: pointer; border-radius: 6px; }
+.virus-select-btn { background: #020202; border: 1px solid #224422; color: #888; padding: 12px; font-family: inherit; font-size: 11px; text-align: left; cursor: pointer; border-radius: 6px; width: 100%; }
 .virus-select-btn.active { border-color: #39ff14; color: #39ff14; background: rgba(57,255,20,0.05); font-weight: bold; }
 .virus-select-btn.locked { border-color: #222; color: #444; cursor: not-allowed; }
 
 .compiler-work-zone { width: 65%; padding: 15px; display: flex; flex-direction: column; background: #030305; box-sizing: border-box; }
-.compiler-display { flex: 1; background: #000; border: 1px solid #112211; border-radius: 6px; padding: 15px; margin-bottom: 15px; overflow-y: auto; }
-.compiler-log { font-size: 12px; color: #88ff88; line-height: 1.5; white-space: pre-wrap; }
+.compiler-display { flex: 1; background: #000; border: 1px solid #112211; border-radius: 6px; padding: 15px; margin-bottom: 15px; overflow-y: auto; height: 180px; }
+.compiler-log { font-size: 11px; color: #88ff88; line-height: 1.5; white-space: pre-wrap; font-family: monospace; }
 
 /* ТАСКБАР И ПОЛОСКИ С СКРЫТНОСТЬЮ */
 .taskbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 45px; background: rgba(10, 10, 10, 0.9); border-top: 1px solid #224422; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-sizing: border-box; z-index: 500; }
-.start-btn { background: #111; border: 1px solid #39ff14; padding: 5px 12px; font-size: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+.start-btn { background: #111; border: 1px solid #39ff14; padding: 5px 12px; font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer; color: #39ff14; }
 .start-btn:hover { background: #39ff14; color: #000; }
 .taskbar-indicators { display: flex; align-items: center; gap: 20px; }
 .indicator-group { display: flex; align-items: center; gap: 10px; }
-.ind-label { font-size: 11px; font-weight: bold; color: #888; }
+.ind-label { font-size: 10px; font-weight: bold; color: #888; }
 .ind-value { font-size: 11px; font-weight: bold; width: 35px; text-align: right; }
-.ind-bar { width: 120px; height: 8px !important; }
+.ind-bar { width: 100px; height: 8px !important; }
 
 .system-tray { background: #000; border: 1px solid #113311; padding: 5px 15px; border-radius: 6px; }
 .clock { font-size: 14px; font-weight: bold; color: #39ff14; text-shadow: 0 0 5px #39ff14; letter-spacing: 1px; }
 
 .progress-bar-bg { width: 100%; height: 10px; background: #111; border: 1px solid #224422; border-radius: 4px; overflow: hidden; }
-.progress-bar-fill { height: 100%; background: #39ff14; box-shadow: 0 0 8px #39ff14; transition: width 0.3s ease, background-color 0.3s ease; }
+.progress-bar-fill { height: 100%; background: #39ff14; box-shadow: 0 0 8px #39ff14; transition: width 0.1s ease; }
 .hidden { display: none !important; }
