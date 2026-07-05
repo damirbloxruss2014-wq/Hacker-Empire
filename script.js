@@ -51,8 +51,32 @@ document.addEventListener("DOMContentLoaded", function () {
     const keyboardHint = document.getElementById("keyboard-hint");
 
     function updateUI() {
-        if (!walletDisplay) return;
-        walletDisplay.innerText = balance + " BTC";
+        if (walletDisplay) walletDisplay.innerText = balance + " BTC";
+        if (stealthDisplay) stealthDisplay.innerText = Math.round(stealth) + "%";
+        if (stealthBar) stealthBar.style.width = stealth + "%";
+        if (sleepDisplay) sleepDisplay.innerText = fatigue + "%";
+        if (sleepBar) sleepBar.style.width = fatigue + "%";
+        if (reputationDisplay) reputationDisplay.innerText = reputation + " XP";
+        if (workersDisplay) workersDisplay.innerText = workersCount + " ХАКЕРОВ";
+        
+        if (stealthBar) {
+            stealthBar.style.backgroundColor = stealth > 60 ? "#39ff14" : (stealth > 30 ? "#ffaa00" : "#ff3333");
+        }
+
+        if (aggressionStatus) {
+            if (aggressionPoints > 50) {
+                aggressionStatus.innerText = "КРИТИЧЕСКАЯ УГРОЗА";
+                aggressionStatus.style.color = "#ff3333";
+            } else if (aggressionPoints > 20) {
+                aggressionStatus.innerText = "РАЗДРАЖЕННЫЙ";
+                aggressionStatus.style.color = "#ffaa00";
+            } else {
+                aggressionStatus.innerText = "НЕЙТРАЛЬНАЯ";
+                aggressionStatus.style.color = "#00f0ff";
+            }
+        }
+    }
+
         stealthDisplay.innerText = Math.round(stealth) + "%";
         stealthBar.style.width = stealth + "%";
         sleepDisplay.innerText = fatigue + "%";
