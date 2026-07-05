@@ -79,71 +79,53 @@ document.addEventListener("DOMContentLoaded", function () {
             aggressionStatus.style.color = "#00f0ff";
         }
     }
-    if (agreementCheckbox) {
-        agreementCheckbox.addEventListener("change", function () {
-            agreementBtn.disabled = !this.checked;
-        });
-    }
+    const chatMessages = document.getElementById("chat-messages-box");
+    const chatActions = document.getElementById("chat-actions-zone");
+    const threatContact = document.getElementById("threat-contact");
+    const hacknetLoader = document.getElementById("hacknet-loader");
+    const hacknetContent = document.getElementById("hacknet-content");
+    const forumThreads = document.getElementById("forum-threads-box");
+    const aggressionStatus = document.getElementById("aggression-status");
+    const postingZone = document.getElementById("forum-posting-zone");
+    const walletDisplay = document.getElementById("wallet-display");
+    const stealthDisplay = document.getElementById("stealth-display");
+    const stealthBar = document.getElementById("stealth-bar");
+    const sleepDisplay = document.getElementById("sleep-display");
+    const sleepBar = document.getElementById("sleep-bar");
+    const reputationDisplay = document.getElementById("reputation-display");
+    const workersDisplay = document.getElementById("workers-display");
+    const compilerLog = document.getElementById("compiler-log-box");
+    const compileBar = document.getElementById("compile-bar");
+    const keyboardHint = document.getElementById("keyboard-hint");
 
-    if (agreementBtn) {
-        agreementBtn.addEventListener("click", function () {
-            if (agreementCheckbox.checked) {
-                agreementModal.classList.add("hidden");
-                tutorialModal.classList.remove("hidden");
-            }
-        });
-    }
-
-    window.closeTutorial = function (startTutorial) {
-        tutorialModal.classList.add("hidden");
-        desktop.classList.remove("blurred");
+    function updateUI() {
+        if (!walletDisplay) return;
+        walletDisplay.innerText = balance + " BTC";
+        stealthDisplay.innerText = Math.round(stealth) + "%";
+        stealthBar.style.width = stealth + "%";
+        sleepDisplay.innerText = fatigue + "%";
+        sleepBar.style.width = fatigue + "%";
+        reputationDisplay.innerText = reputation + " XP";
+        workersDisplay.innerText = workersCount + " ХАКЕРОВ";
         
-        if (startTutorial) {
-            isTutorialActive = true;
-            tutorialStep = 1;
-            guideBox.classList.remove("hidden");
-            guideText.innerText = "ИНСТРУКЦИЯ: Нажмите на приложение Anongram. Другие ярлыки заблокированы.";
-            sendBotMessage("Система: Запущен интерактивный режим обучения.");
+        if (stealth > 60) {
+            stealthBar.style.backgroundColor = "#39ff14";
+        } else if (stealth > 30) {
+            stealthBar.style.backgroundColor = "#ffaa00";
         } else {
-            sendBotMessage("BlackWork Bot: Работаешь соло? Первые контракты уже в чате.");
-            generateNewContract();
-        }
-        
-        clockInterval = setInterval(updateGameClock, 1000);
-        setInterval(passiveThreatLogic, 1000);
-    };
-
-    function updateGameClock() {
-        if (isSleeping || isGameOver) return;
-        gameMinute += 1;
-        
-        if (currentContract && currentContract.status === "pending") {
-            contractTimer += 1;
-            if (contractTimer > 20) {
-                reputation = Math.max(0, reputation - 2);
-                updateUI();
-            }
+            stealthBar.style.backgroundColor = "#ff3333";
         }
 
-        if (gameMinute >= 60) {
-            gameMinute = 0;
-            gameHour += 1;
-            fatigue = Math.min(100, fatigue + 4);
-            if (fatigue >= 100) {
-                triggerFaint();
-            }
-            if (workersCount > 0) {
-                balance += workersCount * 5;
-                sendBotMessage("Система: Штат принес пассивный доход +" + (workersCount * 5) + " BTC.");
-            }
-            if (gameHour >= 24) {
-                gameHour = 0;
-                canPostToday = true;
-                postingZone.classList.remove("hidden");
-            }
+        if (aggressionPoints > 50) {
+            aggressionStatus.innerText = "КРИТИЧЕСКАЯ УГРОЗА";
+            aggressionStatus.style.color = "#ff3333";
+        } else if (aggressionPoints > 20) {
+            aggressionStatus.innerText = "РАЗДРАЖЕННЫЙ";
+            aggressionStatus.style.color = "#ffaa00";
+        } else {
+            aggressionStatus.innerText = "НЕЙТРАЛЬНАЯ";
+            aggressionStatus.style.color = "#00f0ff";
         }
-        gameClock.innerText = String(gameHour).padStart(2, '0') + ":" + String(gameMinute).padStart(2, '0');
-        updateUI();
     }
     window.toggleSleep = function() {
         if (isTutorialActive) return alert("Гид: Сон заблокирован в туториале!");
@@ -220,6 +202,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         guideText.innerText = "ИНСТРУКЦИЯ: Изучи вкладки 5chan, Shop и Wallet."; 
                         setTimeout(finishTutorial, 5000); 
                     }
+                    document.getElementById("tab-5chan").classList.add("active");
                     updateUI();
                 }, 150);
             }
@@ -352,7 +335,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("virus-type-" + typeId).classList.add('active');
         
         if (currentContract && currentContract.status === "active") { 
-            compilerLog.innerText = "[NetBreaker] Жду кодинг...\n[НАЖИМАЙ КЛАВИШИ НА КЛАВИАТУРЕ!]\n"; 
+            compilerLog.innerText = "[NetBreaker] Жду кодинг...\n[НАЖИМАЙ ЛЮБЫЕ КЛАВИШИ НА КЛАВИАТУРЕ!]\n"; 
             keyboardHint.classList.remove("hidden"); 
         } else { 
             compilerLog.innerText = "[NetBreaker] Нужен контракт.\n"; 
@@ -436,94 +419,3 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Мало BTC!"); 
         }
     };
-    window.buyMaldives = function() {
-        if (balance >= 10000) {
-            balance -= 10000; 
-            isGameOver = true; 
-            clearInterval(clockInterval);
-            desktop.innerHTML = "<div class='modal-overlay' style='background:#000; z-index:999999;'><div class='modal-box' style='border-color:#00f0ff;'><h1 style='color:#00f0ff;'>🌴 МИССИЯ ВЫПОЛНЕНА</h1><p style='color:#fff; text-align:left;'>Вы отмыли миллионы, купили билет до Мальдив и обошли ловушки ФБР. Жесткие диски сожжены термитом.<br><br><strong>Anonymous, ты выиграл эту кибер-войну! Твоя хакерская империя ушла в тень, а ты улетел встречать закаты на океане.</strong></p><button class='nav-btn' onclick='location.reload()'>ЕЩЕ РАЗ</button></div></div>";
-        } else { 
-            alert("Мало BTC! Билет стоит 10000 BTC."); 
-        }
-    };
-
-    window.submitForumPost = function(id) { 
-        if (!canPostToday) return; 
-        canPostToday = false; 
-        postingZone.classList.add("hidden"); 
-        if (id === 1) { aggressionPoints += 30; stealth = Math.max(0, stealth - 20); } 
-        else if (id === 2) { aggressionPoints += 15; stealth = Math.max(0, stealth - 10); } 
-        else if (id === 3) { aggressionPoints = Math.max(0, aggressionPoints - 15); } 
-        generateForumPosts(); 
-        updateUI(); 
-    };
-
-    window.switchTab = function (id) { 
-        const tabs = document.querySelectorAll('.tab-content'); 
-        const btns = document.querySelectorAll('.tab-btn'); 
-        tabs.forEach(t => t.classList.remove('active')); 
-        btns.forEach(b => b.classList.remove('active')); 
-        document.getElementById(id).classList.add('active'); 
-    };
-
-    window.buyProtection = function (cost, am) { 
-        if (balance >= cost) { 
-            balance -= cost; 
-            stealth = Math.min(100, stealth + am); 
-            updateUI(); 
-            alert("Защита куплена!"); 
-            generateForumPosts(); 
-        } else { 
-            alert("Мало BTC!"); 
-        } 
-    };
-
-    window.buyPCUpgrade = function (cost, id) { 
-        if (balance >= cost) { 
-            balance -= cost; 
-            pcUpgradeLevel = id; 
-            document.getElementById("pc-item-" + id).disabled = true; 
-            document.getElementById("pc-item-" + id).innerText = "OK"; 
-            const b = document.getElementById("virus-type-" + id); 
-            b.classList.remove("locked"); 
-            b.disabled = false; 
-            updateUI(); 
-            alert("ПК обновлен!"); 
-        } else { 
-            alert("Мало BTC!"); 
-        } 
-    };
-    
-    function generateForumPosts() { 
-        forumThreads.innerHTML = ""; 
-        const g = ["Анон: Anonymous гений взлома!", "Anon: Наша борда за свободный нет!"]; 
-        const b = ["Шпион: Киберполиция запустила трекеры.", "Хейтер: Защита Anonymous падает!"]; 
-        if (stealth < 50) forumThreads.innerHTML += "<div class='post' style='border-color:#f33; color:#ff8888;'><strong>🚨 УГРОЗА:</strong> " + b[Math.floor(Math.random() * b.length)] + "</div>"; 
-        else forumThreads.innerHTML += "<div class='post'><strong>🔗 ТРЕД:</strong> " + g[Math.floor(Math.random() * g.length)] + "</div>"; 
-    }
-    
-    function passiveThreatLogic() {
-        if (isSleeping || isTutorialActive || isGameOver) return;
-        stealth = Math.max(0, stealth - ((Math.random() * 3 + 2) / 60 + workersCount * 0.05) * (hasQuantumPC ? 0.5 : 1.0)); 
-        let rs = Math.round(stealth);
-        if (rs < 50 && rs >= 30) { 
-            if (Math.random() < 0.05) generateForumPosts(); 
-        } else if (rs < 30 && rs > 0) { 
-            threatContact.classList.remove("hidden"); 
-            if (Math.random() < 0.04) { 
-                const m = document.createElement("div"); m.className = "msg threat-msg"; m.innerText = "ENEMY: Кошелек под угрозой. Копы близко."; 
-                chatMessages.appendChild(m); chatMessages.scrollTop = chatMessages.scrollHeight; 
-            } 
-        } else if (rs <= 0) { 
-            triggerGameOver(); 
-        } 
-        updateUI();
-    }
-    
-    function triggerGameOver() { 
-        clearInterval(clockInterval); 
-        desktop.innerHTML = "<div class='modal-overlay' style='background:#000; z-index:99999;'><div class='modal-box' style='border-color:#f33;'><h1 style='color:#f33;'>🛑 ОБЛАВА ПОЛИЦИИ</h1><p style='color:#ff8888; text-align:left;'>Скрытность 0%. Спецслужбы отследили адрес шлюза.<br><br><strong>Штурмовой отряд киберполиции выбил вашу дверь. Вы арестованы. Империя пала.</strong></p><button class='nav-btn' onclick='location.reload()'>НАЧАТЬ СНАЧАЛА</button></div></div>"; 
-    }
-    
-    updateUI();
-});
