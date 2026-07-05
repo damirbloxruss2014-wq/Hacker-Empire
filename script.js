@@ -211,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } else alert("Мало BTC!"); 
     };
 
-    window.buyQuantumPC = function() { 
+     window.buyQuantumPC = function() { 
         if (balance >= 1500) { 
             balance -= 1500; 
             hasQuantumPC = true; 
@@ -221,6 +221,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("AI-Quantum запущен! Слежка х2 меньше."); 
         } else alert("Мало BTC!"); 
     };
+
 
     window.buyMansion = function() { 
         if (balance >= 4500) { 
